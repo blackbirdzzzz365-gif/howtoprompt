@@ -6,9 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OpenClaw x Codex Mission Control Academy",
+  title: "OpenClaw x Codex | Học viện Mission Control",
   description:
-    "Interactive website de hoc cach dung OpenClaw x Codex dung quy tac, prompt va simulator.",
+    "Trang web tương tác giúp bạn học cách dùng OpenClaw x Codex qua lộ trình nhiệm vụ, Prompt Lab và mô phỏng tình huống.",
 };
 
 export default function RootLayout({
@@ -26,13 +26,13 @@ export default function RootLayout({
             <main className="page-frame">{children}</main>
             <footer className="site-footer">
               <div>
-                <p className="eyebrow">Mission Control Academy</p>
+                <p className="eyebrow">Học viện Mission Control</p>
                 <p className="footer-copy">
-                  Duoc xay tu{" "}
+                  Nội dung được xây dựng từ{" "}
                   <Link href="/missions" className="inline-link">
-                    6 missions
+                    6 nhiệm vụ
                   </Link>{" "}
-                  va guide authoritative de day user prompt dung ngay tu dau.
+                  và guide gốc để bạn có thể hiểu hệ thống, viết prompt đúng và vào việc nhanh hơn.
                 </p>
               </div>
               <div className="footer-links">
@@ -40,13 +40,13 @@ export default function RootLayout({
                   Prompt Lab
                 </Link>
                 <Link href="/simulator" className="inline-link">
-                  Simulator
+                  Mô phỏng
                 </Link>
                 <Link href="/quick-ref" className="inline-link">
-                  Quick Ref
+                  Thẻ nhắc
                 </Link>
                 <Link href="/ops" className="inline-link">
-                  Ops
+                  Vận hành
                 </Link>
               </div>
             </footer>

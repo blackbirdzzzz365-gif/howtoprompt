@@ -4,11 +4,11 @@ import { quickRefs } from "@/lib/content";
 export default function QuickRefPage() {
   return (
     <section className="panel section-block panel-strong">
-      <p className="eyebrow">Quick Ref Wallet</p>
-      <h1 className="section-title">Copy-safe cards for daily dispatch</h1>
+      <p className="eyebrow">Thẻ nhắc nhanh</p>
+      <h1 className="section-title">Những tấm thẻ ngắn gọn để bạn dùng lại mỗi ngày</h1>
       <p className="section-copy">
-        Quick ref chi mo khoa khi ban complete mission lien quan. Muc tieu la de ban quay lai dung nhanh,
-        khong can doc lai full guide moi lan.
+        Các thẻ nhắc chỉ mở khóa khi bạn hoàn thành nhiệm vụ liên quan. Mục tiêu là để bạn quay lại dùng nhanh,
+        không phải lật lại toàn bộ guide mỗi lần cần viết prompt.
       </p>
       <div style={{ marginTop: "20px" }}>
         <QuickRefWallet items={quickRefs} />

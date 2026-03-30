@@ -3,7 +3,7 @@ import { SimulatorPanel } from "@/components/simulator-panel";
 
 export default function SimulatorPage() {
   return (
-    <Suspense fallback={<div className="empty-state">Dang tai simulator...</div>}>
+    <Suspense fallback={<div className="empty-state">Đang tải trình mô phỏng...</div>}>
       <SimulatorPanel />
     </Suspense>
   );

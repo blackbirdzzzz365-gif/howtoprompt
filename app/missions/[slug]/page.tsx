@@ -3,6 +3,21 @@ import { notFound } from "next/navigation";
 import { MissionMap } from "@/components/mission-map";
 import { getMission, getQuickRef, getScenariosForMission, missions } from "@/lib/content";
 
+const practiceModeLabels: Record<string, string> = {
+  "prompt-lab": "Thực hành prompt",
+  simulator: "Mô phỏng tình huống",
+  mixed: "Kết hợp thực hành",
+};
+
+const focusLabels: Record<string, string> = {
+  "mental-model": "Tư duy nền",
+  prompting: "Viết prompt",
+  "context-safety": "An toàn ngữ cảnh",
+  routing: "Điều phối bot",
+  simulation: "Mô phỏng hệ thống",
+  operations: "Vận hành",
+};
+
 export function generateStaticParams() {
   return missions.map((mission) => ({ slug: mission.slug }));
 }
@@ -24,14 +39,14 @@ export default async function MissionPage({
   return (
     <div className="detail-grid">
       <section className="panel section-block panel-strong">
-        <p className="eyebrow">Mission {String(mission.order).padStart(2, "0")}</p>
+        <p className="eyebrow">Nhiệm vụ {String(mission.order).padStart(2, "0")}</p>
         <h1 className="section-title">{mission.title}</h1>
         <p className="section-copy">{mission.tagline}</p>
 
         <div className="mission-meta" style={{ marginTop: "16px" }}>
           <span className="chip">{mission.duration}</span>
-          <span className="outline-chip">{mission.practiceMode}</span>
-          <span className="outline-chip">{mission.focus}</span>
+          <span className="outline-chip">{practiceModeLabels[mission.practiceMode] ?? mission.practiceMode}</span>
+          <span className="outline-chip">{focusLabels[mission.focus] ?? mission.focus}</span>
         </div>
 
         <div className="list-stack" style={{ marginTop: "22px" }}>
@@ -51,7 +66,7 @@ export default async function MissionPage({
         </div>
 
         <div className="detail-card" style={{ marginTop: "18px" }}>
-          <p className="micro-label">Evidence anchors</p>
+          <p className="micro-label">Điểm tựa từ guide</p>
           <ul className="list-copy" style={{ marginTop: "10px" }}>
             {mission.evidenceBullets.map((bullet) => (
               <li key={bullet}>{bullet}</li>
@@ -62,7 +77,7 @@ export default async function MissionPage({
 
       <aside className="tool-stack sticky-console">
         <section className="tool-card">
-          <p className="micro-label">Unlocked quick ref</p>
+          <p className="micro-label">Thẻ nhắc mở khóa</p>
           <h2 className="mission-title" style={{ marginTop: "6px" }}>
             {quickRef?.title}
           </h2>
@@ -72,7 +87,7 @@ export default async function MissionPage({
           <div className="detail-actions" style={{ marginTop: "16px" }}>
             {mission.practiceMode === "prompt-lab" || mission.practiceMode === "mixed" ? (
               <Link href="/prompt-lab" className="button-primary">
-                Open Prompt Lab
+                Mở Prompt Lab
               </Link>
             ) : null}
             {mission.practiceMode === "simulator" || mission.practiceMode === "mixed" ? (
@@ -80,14 +95,14 @@ export default async function MissionPage({
                 href={`/simulator?scenario=${missionScenarios[0]?.id ?? mission.slug}`}
                 className="button-secondary"
               >
-                Run simulator
+                Chạy mô phỏng
               </Link>
             ) : null}
           </div>
         </section>
 
         <section className="tool-card">
-          <p className="micro-label">Related mission cards</p>
+          <p className="micro-label">Nhiệm vụ liên quan</p>
           <MissionMap missions={missions.filter((item) => item.order !== mission.order).slice(0, 2)} compact />
         </section>
       </aside>
