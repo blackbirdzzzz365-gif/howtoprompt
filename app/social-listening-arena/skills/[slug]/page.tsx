@@ -18,6 +18,35 @@ function formatRawBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function localizeCategory(category: string) {
+  const categoryMap: Record<string, string> = {
+    "Architecture / Engineering": "Kiến trúc / Kỹ thuật",
+    "Blackbird Platform": "Nền tảng Blackbird",
+    "Codex System": "Hệ thống Codex",
+    "General Engineering": "Kỹ thuật tổng quát",
+    "OpenClaw / VM": "OpenClaw / VM",
+    "Plugin GitHub": "Plugin GitHub",
+    "Plugin Canva": "Plugin Canva",
+    "Plugin Skills": "Plugin",
+    "Product / Analysis": "Sản phẩm / Phân tích",
+    "Social Listening v3": "Social Listening v3",
+  };
+
+  return categoryMap[category] || category;
+}
+
+function localizeSourceLabel(sourceLabel: string) {
+  const sourceLabelMap: Record<string, string> = {
+    "Installed Codex Skills": "Installed Codex Skills",
+    "Global Team Skills": "Bộ skill dùng chung của team",
+    "Blackbird Repo Skills": "Skill trong repo Blackbird",
+    "Canva Plugin Skills": "Skill từ plugin Canva",
+    "Github Plugin Skills": "Skill từ plugin GitHub",
+  };
+
+  return sourceLabelMap[sourceLabel] || sourceLabel;
+}
+
 export default async function SkillDetailPage({
   params,
 }: {
@@ -34,7 +63,7 @@ export default async function SkillDetailPage({
       <section className="panel section-block panel-strong">
         <div className="detail-actions">
           <Link href="/social-listening-arena/skills" className="button-ghost">
-            Back to Skill Atlas
+            Quay lại Skill Atlas
           </Link>
           <a href={`/api/skill-atlas/${skill.slug}/raw?ref=skill`} target="_blank" rel="noreferrer" className="button-secondary">
             Raw SKILL.md
@@ -48,21 +77,21 @@ export default async function SkillDetailPage({
         <p className="section-copy">{skill.summaryVi}</p>
 
         <div className="mission-meta" style={{ marginTop: "16px" }}>
-          <span className="chip">{skill.category}</span>
-          <span className="outline-chip">{skill.sourceLabel}</span>
+          <span className="chip">{localizeCategory(skill.category)}</span>
+          <span className="outline-chip">{localizeSourceLabel(skill.sourceLabel)}</span>
           <span className="outline-chip">{formatRawBytes(skill.rawBytes)}</span>
           <span className="outline-chip">{skill.referencedDocs.length} refs</span>
         </div>
 
         <div className="detail-grid detail-grid-tight" style={{ marginTop: "22px" }}>
           <article className="detail-card">
-            <p className="micro-label">Heading</p>
+            <p className="micro-label">Tiêu đề</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               {skill.heading}
             </p>
           </article>
           <article className="detail-card">
-            <p className="micro-label">Source path</p>
+            <p className="micro-label">Đường dẫn nguồn</p>
             <p className="mono-path" style={{ marginTop: "8px" }}>
               {skill.sourcePath}
             </p>
@@ -71,7 +100,7 @@ export default async function SkillDetailPage({
 
         {skill.triggerPhrases.length ? (
           <article className="detail-card" style={{ marginTop: "18px" }}>
-            <p className="micro-label">Trigger phrases</p>
+            <p className="micro-label">Trigger phrases (raw)</p>
             <div className="tag-row" style={{ marginTop: "12px" }}>
               {skill.triggerPhrases.map((trigger) => (
                 <span key={trigger} className="outline-chip">
@@ -84,7 +113,7 @@ export default async function SkillDetailPage({
 
         {skill.workflowHighlights.length ? (
           <article className="detail-card" style={{ marginTop: "18px" }}>
-            <p className="micro-label">Workflow highlights</p>
+            <p className="micro-label">Các bước chính</p>
             <ul className="list-copy" style={{ marginTop: "10px" }}>
               {skill.workflowHighlights.map((step) => (
                 <li key={step}>{step}</li>
@@ -106,7 +135,7 @@ export default async function SkillDetailPage({
 
         {skill.sections.length ? (
           <article className="detail-card" style={{ marginTop: "18px" }}>
-            <p className="micro-label">Sections tom tat</p>
+            <p className="micro-label">Các mục được tóm tắt</p>
             <div className="list-stack" style={{ marginTop: "12px" }}>
               {skill.sections.map((section) => (
                 <div key={section.title} className="reference-card">
@@ -127,14 +156,14 @@ export default async function SkillDetailPage({
               skill.referencedDocs.map((doc) => (
                 <div key={doc.id} className="reference-card">
                   <div className="chip-row">
-                    <span className="chip">{doc.exists ? "resolved" : "unresolved"}</span>
+                    <span className="chip">{doc.exists ? "đã resolve" : "chưa resolve"}</span>
                     <strong>{doc.title}</strong>
                   </div>
                   <p className="mono-path" style={{ marginTop: "8px" }}>
                     {doc.label}
                   </p>
                   <p className="mission-summary" style={{ marginTop: "10px" }}>
-                    {doc.excerpt || "Doc nay moi duoc ghi nhan la path tham chieu, chua co noi dung de preview."}
+                    {doc.excerpt || "Doc này mới được ghi nhận là path tham chiếu, chưa có nội dung để preview."}
                   </p>
                   {doc.raw ? (
                     <div className="detail-actions" style={{ marginTop: "14px" }}>
@@ -144,20 +173,20 @@ export default async function SkillDetailPage({
                         rel="noreferrer"
                         className="button-secondary"
                       >
-                        Mo raw doc
+                        Mở raw doc
                       </a>
                     </div>
                   ) : null}
                 </div>
               ))
             ) : (
-              <div className="empty-state">Skill nay khong co referral doc duoc sync.</div>
+              <div className="empty-state">Skill này không có referral doc đã được sync.</div>
             )}
           </div>
         </article>
 
         <article className="detail-card" style={{ marginTop: "18px" }}>
-          <p className="micro-label">Raw preview</p>
+          <p className="micro-label">Xem nhanh raw</p>
           <pre className="example-prompt" style={{ marginTop: "10px", maxHeight: "360px" }}>
             <code>{skill.raw}</code>
           </pre>
@@ -168,7 +197,7 @@ export default async function SkillDetailPage({
         <SkillExplainPanel skillSlug={skill.slug} />
 
         <section className="tool-card">
-          <p className="micro-label">Related skills</p>
+          <p className="micro-label">Skill liên quan</p>
           <div className="list-stack" style={{ marginTop: "12px" }}>
             {skill.relatedSkillSlugs.length > 0 ? (
               skill.relatedSkillSlugs.map((relatedSlug, index) => (
@@ -181,13 +210,13 @@ export default async function SkillDetailPage({
                 </Link>
               ))
             ) : (
-              <div className="empty-state">Skill nay chua co related skill duoc map tu raw docs.</div>
+              <div className="empty-state">Skill này chưa có related skill được map từ raw docs.</div>
             )}
           </div>
         </section>
 
         <section className="tool-card">
-          <p className="micro-label">All source paths</p>
+          <p className="micro-label">Tất cả source paths</p>
           <ul className="list-copy" style={{ marginTop: "12px" }}>
             {skill.allSourcePaths.map((item) => (
               <li key={item}>

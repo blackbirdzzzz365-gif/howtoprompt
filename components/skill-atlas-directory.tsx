@@ -41,6 +41,35 @@ function formatRawBytes(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+function localizeCategory(category: string) {
+  const categoryMap: Record<string, string> = {
+    "Architecture / Engineering": "Kiến trúc / Kỹ thuật",
+    "Blackbird Platform": "Nền tảng Blackbird",
+    "Codex System": "Hệ thống Codex",
+    "General Engineering": "Kỹ thuật tổng quát",
+    "OpenClaw / VM": "OpenClaw / VM",
+    "Plugin GitHub": "Plugin GitHub",
+    "Plugin Canva": "Plugin Canva",
+    "Plugin Skills": "Plugin",
+    "Product / Analysis": "Sản phẩm / Phân tích",
+    "Social Listening v3": "Social Listening v3",
+  };
+
+  return categoryMap[category] || category;
+}
+
+function localizeSourceLabel(sourceLabel: string) {
+  const sourceLabelMap: Record<string, string> = {
+    "Installed Codex Skills": "Installed Codex Skills",
+    "Global Team Skills": "Bộ skill dùng chung của team",
+    "Blackbird Repo Skills": "Skill trong repo Blackbird",
+    "Canva Plugin Skills": "Skill từ plugin Canva",
+    "Github Plugin Skills": "Skill từ plugin GitHub",
+  };
+
+  return sourceLabelMap[sourceLabel] || sourceLabel;
+}
+
 export function SkillAtlasDirectory({
   generatedAt,
   skillCount,
@@ -49,7 +78,7 @@ export function SkillAtlasDirectory({
   skills,
 }: SkillAtlasDirectoryProps) {
   const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("Tat ca");
+  const [activeCategory, setActiveCategory] = useState("Tất cả");
   const deferredQuery = useDeferredValue(query);
 
   const normalized = deferredQuery
@@ -59,7 +88,7 @@ export function SkillAtlasDirectory({
     .trim();
 
   const filteredSkills = skills.filter((skill) => {
-    const matchesCategory = activeCategory === "Tat ca" || skill.category === activeCategory;
+    const matchesCategory = activeCategory === "Tất cả" || skill.category === activeCategory;
     if (!matchesCategory) {
       return false;
     }
@@ -80,10 +109,10 @@ export function SkillAtlasDirectory({
     <div className="detail-grid">
       <section className="panel section-block panel-strong">
         <p className="eyebrow">SL Arena / Skill Atlas</p>
-        <h1 className="section-title">Kho skill Codex + referral docs da duoc sync vao app</h1>
+        <h1 className="section-title">Kho skill Codex và referral docs đã được sync vào app</h1>
         <p className="section-copy">
-          Day la catalog da snapshot tu may cua ban. Moi skill co ten, cong dung, trigger phrases, workflow,
-          related skills, raw `SKILL.md`, va referral docs de ban doc lai hoac hoi AI.
+          Đây là catalog đã được snapshot từ máy của bạn. Mỗi skill có tên, công dụng, trigger phrases,
+          workflow, related skills, raw `SKILL.md`, và referral docs để bạn đọc lại hoặc hỏi AI.
         </p>
 
         <div className="stats-grid" style={{ marginTop: "22px" }}>
@@ -104,33 +133,33 @@ export function SkillAtlasDirectory({
         </div>
 
         <div className="detail-card" style={{ marginTop: "22px" }}>
-          <p className="micro-label">Sync model</p>
+          <p className="micro-label">Mô hình sync</p>
           <p className="mission-summary" style={{ marginTop: "8px" }}>
-            Production site khong doc truc tiep filesystem skill tren may Mac cua ban. Vi vay atlas nay duoc sync
-            thanh JSON DB roi moi deploy. Luc skill doi, ban chi can yeu cau Codex rerun `pnpm sync:skills`, review
-            diff, roi deploy lai site.
+            Production site không đọc trực tiếp filesystem skill trên máy Mac của bạn. Vì vậy atlas này được sync
+            thành JSON DB rồi mới deploy. Khi skill đổi, bạn chỉ cần yêu cầu Codex chạy lại `pnpm sync:skills`,
+            review diff, rồi deploy lại site.
           </p>
         </div>
 
         <div className="atlas-toolbar" style={{ marginTop: "22px" }}>
           <label className="field-group atlas-search">
-            <span className="micro-label">Tim skill</span>
+            <span className="micro-label">Tìm skill</span>
             <input
               className="input-field"
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Vi du: production audit, phase executor, github, design system..."
+              placeholder="Ví dụ: production audit, phase executor, github, design system..."
             />
           </label>
           <div className="chip-row">
             <button
               type="button"
               className="nav-link"
-              data-active={activeCategory === "Tat ca"}
-              onClick={() => setActiveCategory("Tat ca")}
+              data-active={activeCategory === "Tất cả"}
+              onClick={() => setActiveCategory("Tất cả")}
             >
-              Tat ca
+              Tất cả
             </button>
             {categories.map((category) => (
               <button
@@ -140,7 +169,7 @@ export function SkillAtlasDirectory({
                 data-active={activeCategory === category}
                 onClick={() => setActiveCategory(category)}
               >
-                {category}
+                {localizeCategory(category)}
               </button>
             ))}
           </div>
@@ -150,9 +179,9 @@ export function SkillAtlasDirectory({
           {filteredSkills.map((skill) => (
             <article key={skill.slug} className="skill-card">
               <div className="chip-row">
-                <span className="chip">{skill.category}</span>
+                <span className="chip">{localizeCategory(skill.category)}</span>
                 {skill.isAlias ? <span className="outline-chip">alias</span> : null}
-                <span className="outline-chip">{skill.sourceLabel}</span>
+                <span className="outline-chip">{localizeSourceLabel(skill.sourceLabel)}</span>
               </div>
 
               <h2 className="mission-title" style={{ marginTop: "14px" }}>
@@ -187,7 +216,7 @@ export function SkillAtlasDirectory({
                   {skill.referencedDocCount} refs • {skill.relatedSkillNames.length} related • {formatRawBytes(skill.rawBytes)}
                 </span>
                 <Link href={`/social-listening-arena/skills/${skill.slug}`} className="button-secondary">
-                  Mo chi tiet
+                  Mở chi tiết
                 </Link>
               </div>
             </article>
@@ -196,7 +225,7 @@ export function SkillAtlasDirectory({
 
         {filteredSkills.length === 0 ? (
           <div className="empty-state" style={{ marginTop: "22px" }}>
-            Khong co skill nao khop bo loc hien tai.
+            Không có skill nào khớp bộ lọc hiện tại.
           </div>
         ) : null}
       </section>
@@ -205,23 +234,23 @@ export function SkillAtlasDirectory({
         <SkillAdvisorPanel />
 
         <section className="tool-card">
-          <p className="micro-label">Cach hoc nhanh</p>
+          <p className="micro-label">Cách học nhanh</p>
           <ul className="list-copy" style={{ marginTop: "12px" }}>
-            <li>Bat dau tu skill list de biet map tong the.</li>
-            <li>Neu ban co tinh huong cu the, dung AI advisor truoc de shortlist.</li>
-            <li>Vao trang chi tiet cua tung skill de doc workflow, guardrails, related skills, va raw docs.</li>
-            <li>Khi skill doi, sync snapshot moi roi deploy lai de web khong bi lech thuc te.</li>
+            <li>Bắt đầu từ skill list để nắm map tổng thể.</li>
+            <li>Nếu bạn có tình huống cụ thể, hãy dùng AI advisor trước để shortlist.</li>
+            <li>Vào trang chi tiết của từng skill để đọc workflow, guardrails, related skills và raw docs.</li>
+            <li>Khi skill đổi, hãy sync snapshot mới rồi deploy lại để web không bị lệch thực tế.</li>
           </ul>
         </section>
 
         <section className="tool-card">
-          <p className="micro-label">Back to arena</p>
+          <p className="micro-label">Quay lại arena</p>
           <p className="mission-summary" style={{ marginTop: "8px" }}>
-            Neu ban muon hoc theo game flow owner -&gt; bot -&gt; Codex -&gt; prod, quay lai quest board chinh.
+            Nếu bạn muốn học theo game flow owner -&gt; bot -&gt; Codex -&gt; prod, hãy quay lại quest board chính.
           </p>
           <div className="detail-actions" style={{ marginTop: "16px" }}>
             <Link href="/social-listening-arena" className="button-primary">
-              Quay lai SL Arena
+              Quay lại SL Arena
             </Link>
           </div>
         </section>

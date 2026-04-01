@@ -7,7 +7,7 @@ type AdvisorSkill = {
   slug: string;
   name: string;
   reason_vi: string;
-  confidence: "cao" | "vua" | "thap";
+  confidence: "cao" | "vừa" | "thấp";
 };
 
 type AdvisorResponse = {
@@ -24,47 +24,41 @@ type ShortlistItem = {
   category: string;
 };
 
-const storageKeys = {
-  apiKey: "skill-atlas:chiasegpu-key",
-  model: "skill-atlas:chiasegpu-model",
-};
-
 export function SkillAdvisorPanel() {
+  const storageScope = "skill-atlas-advisor";
   const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState("gpt-4.1-mini");
+  const [resolvedModel, setResolvedModel] = useState("");
   const [need, setNeed] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<AdvisorResponse | null>(null);
   const [shortlist, setShortlist] = useState<ShortlistItem[]>([]);
+  const [usedFallback, setUsedFallback] = useState(false);
+  const [providerError, setProviderError] = useState("");
 
   useEffect(() => {
-    const savedApiKey = window.localStorage.getItem(storageKeys.apiKey);
-    const savedModel = window.localStorage.getItem(storageKeys.model);
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
+    const sectionApiKey = window.localStorage.getItem(getStorageKey(storageScope, "apiKey"));
+    const legacyApiKey = window.localStorage.getItem("skill-atlas:chiasegpu-key");
+    const sectionModel = window.localStorage.getItem(getStorageKey(storageScope, "model"));
+    if (sectionApiKey || legacyApiKey) {
+      setApiKey(sectionApiKey || legacyApiKey || "");
     }
-    if (savedModel) {
-      setModel(savedModel);
+    if (sectionModel) {
+      setResolvedModel(sectionModel);
     }
-  }, []);
+  }, [storageScope]);
 
   useEffect(() => {
     if (apiKey) {
-      window.localStorage.setItem(storageKeys.apiKey, apiKey);
+      window.localStorage.setItem(getStorageKey(storageScope, "apiKey"), apiKey);
     }
-  }, [apiKey]);
-
-  useEffect(() => {
-    if (model) {
-      window.localStorage.setItem(storageKeys.model, model);
-    }
-  }, [model]);
+  }, [apiKey, storageScope]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setProviderError("");
 
     try {
       const response = await fetch("/api/skill-atlas/advice", {
@@ -74,20 +68,25 @@ export function SkillAdvisorPanel() {
         },
         body: JSON.stringify({
           apiKey,
-          model,
           need,
         }),
       });
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload.error || "Khong goi duoc AI advisor.");
+        throw new Error(payload.error || "Không gọi được AI advisor.");
       }
 
       setResult(payload.response as AdvisorResponse);
       setShortlist(payload.shortlist as ShortlistItem[]);
+      setResolvedModel(payload.model || "");
+      setUsedFallback(Boolean(payload.usedFallback));
+      setProviderError(payload.providerError || "");
+      if (payload.model) {
+        window.localStorage.setItem(getStorageKey(storageScope, "model"), payload.model);
+      }
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Khong goi duoc AI advisor.");
+      setError(submitError instanceof Error ? submitError.message : "Không gọi được AI advisor.");
       setResult(null);
       setShortlist([]);
     } finally {
@@ -96,13 +95,14 @@ export function SkillAdvisorPanel() {
   }
 
   return (
-    <section className="tool-card sticky-console">
+    <section className="tool-card">
       <p className="micro-label">AI Skill Advisor</p>
       <h2 className="mission-title" style={{ marginTop: "8px" }}>
-        Nhap mong muon, AI se goi y bo skill nen dung
+        Nhập mong muốn, AI sẽ gợi ý bộ skill nên dùng
       </h2>
       <p className="mission-summary" style={{ marginTop: "10px" }}>
-        Key `chiasegpu` duoc nhap truc tiep tren web va chi luu trong local storage cua trinh duyet nay.
+        API key `chiasegpu` được lưu riêng cho khu vực này trong trình duyệt của bạn. Hệ thống sẽ tự chọn model phù hợp,
+        bạn không cần nhập tay.
       </p>
 
       <form className="list-stack" style={{ marginTop: "16px" }} onSubmit={handleSubmit}>
@@ -119,22 +119,11 @@ export function SkillAdvisorPanel() {
         </label>
 
         <label className="field-group">
-          <span className="micro-label">Model</span>
-          <input
-            className="input-field"
-            type="text"
-            placeholder="gpt-4.1-mini"
-            value={model}
-            onChange={(event) => setModel(event.target.value)}
-          />
-        </label>
-
-        <label className="field-group">
-          <span className="micro-label">Mong muon cua ban</span>
+          <span className="micro-label">Mong muốn của bạn</span>
           <textarea
             className="textarea-field"
             rows={7}
-            placeholder="Vi du: Toi muon audit production cho social-listening-v3, dung o checkpoint verdict, roi de toi chot contained-fix hay new-phase."
+            placeholder="Ví dụ: Tôi muốn audit production cho social-listening-v3, dừng ở checkpoint verdict, rồi để tôi chốt contained-fix hay new-phase."
             value={need}
             onChange={(event) => setNeed(event.target.value)}
             required
@@ -142,9 +131,13 @@ export function SkillAdvisorPanel() {
         </label>
 
         <button className="button-primary" type="submit" disabled={loading}>
-          {loading ? "Dang hoi AI..." : "Hoi AI advisor"}
+          {loading ? "Đang hỏi AI..." : "Hỏi AI advisor"}
         </button>
       </form>
+
+      <p className="muted-copy" style={{ marginTop: "12px" }}>
+        {resolvedModel ? `Model đang dùng gần nhất: ${resolvedModel}` : "Model sẽ được tự nhận diện sau lần gọi đầu tiên."}
+      </p>
 
       {error ? (
         <div className="empty-state" style={{ marginTop: "16px", borderStyle: "solid" }}>
@@ -154,15 +147,22 @@ export function SkillAdvisorPanel() {
 
       {result ? (
         <div className="list-stack" style={{ marginTop: "18px" }}>
+          {usedFallback ? (
+            <div className="empty-state">
+              Đang hiển thị gợi ý fallback cục bộ do AI provider chưa phản hồi ổn định.
+              {providerError ? ` Chi tiết: ${providerError}` : ""}
+            </div>
+          ) : null}
+
           <article className="detail-card">
-            <p className="micro-label">Ket luan</p>
+            <p className="micro-label">Kết luận</p>
             <p className="mission-summary" style={{ marginTop: "10px" }}>
               {result.answer_vi}
             </p>
           </article>
 
           <article className="detail-card">
-            <p className="micro-label">Skill goi y</p>
+            <p className="micro-label">Skill gợi ý</p>
             <div className="list-stack" style={{ marginTop: "12px" }}>
               {result.recommended_skills.length > 0 ? (
                 result.recommended_skills.map((skill) => (
@@ -176,20 +176,20 @@ export function SkillAdvisorPanel() {
                     </p>
                     <div className="detail-actions" style={{ marginTop: "14px" }}>
                       <Link href={`/social-listening-arena/skills/${skill.slug}`} className="button-secondary">
-                        Xem skill nay
+                        Xem skill này
                       </Link>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="empty-state">AI chua chot duoc skill ro rang. Hay noi yeu cau cu the hon.</div>
+                <div className="empty-state">AI chưa chốt được skill rõ ràng. Hãy nói yêu cầu cụ thể hơn.</div>
               )}
             </div>
           </article>
 
           {result.follow_up_vi ? (
             <article className="detail-card">
-              <p className="micro-label">Prompt tiep theo</p>
+              <p className="micro-label">Prompt tiếp theo</p>
               <p className="mission-summary" style={{ marginTop: "10px" }}>
                 {result.follow_up_vi}
               </p>
@@ -198,7 +198,7 @@ export function SkillAdvisorPanel() {
 
           {result.notes_vi?.length ? (
             <article className="detail-card">
-              <p className="micro-label">Luu y</p>
+              <p className="micro-label">Lưu ý</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.notes_vi.map((note) => (
                   <li key={note}>{note}</li>
@@ -209,13 +209,13 @@ export function SkillAdvisorPanel() {
 
           {shortlist.length > 0 ? (
             <article className="detail-card">
-              <p className="micro-label">Local shortlist truoc khi goi AI</p>
+              <p className="micro-label">Shortlist local trước khi gọi AI</p>
               <div className="list-stack" style={{ marginTop: "10px" }}>
                 {shortlist.map((entry) => (
                   <div key={entry.slug} className="outline-row">
                     <div>
                       <strong>{entry.name}</strong>
-                      <p className="muted-copy">{entry.category}</p>
+                      <p className="muted-copy">{localizeCategory(entry.category)}</p>
                     </div>
                     <span className="outline-chip">score {entry.score}</span>
                   </div>
@@ -227,4 +227,25 @@ export function SkillAdvisorPanel() {
       ) : null}
     </section>
   );
+}
+
+function getStorageKey(scope: string, field: string) {
+  return `skill-atlas:${scope}:${field}`;
+}
+
+function localizeCategory(category: string) {
+  const categoryMap: Record<string, string> = {
+    "Architecture / Engineering": "Kiến trúc / Kỹ thuật",
+    "Blackbird Platform": "Nền tảng Blackbird",
+    "Codex System": "Hệ thống Codex",
+    "General Engineering": "Kỹ thuật tổng quát",
+    "OpenClaw / VM": "OpenClaw / VM",
+    "Plugin GitHub": "Plugin GitHub",
+    "Plugin Canva": "Plugin Canva",
+    "Plugin Skills": "Plugin",
+    "Product / Analysis": "Sản phẩm / Phân tích",
+    "Social Listening v3": "Social Listening v3",
+  };
+
+  return categoryMap[category] || category;
 }
