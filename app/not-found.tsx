@@ -4,14 +4,14 @@ export default function NotFound() {
   return (
     <section className="panel section-block panel-strong">
       <p className="eyebrow">404</p>
-      <h1 className="section-title">Không tìm thấy nhiệm vụ này</h1>
-      <p className="section-copy">Bạn quay lại lộ trình để chọn đúng nội dung, hoặc tiếp tục luyện prompt nếu muốn.</p>
+      <h1 className="section-title">Stage khong ton tai</h1>
+      <p className="section-copy">Quay lai stage map de chon dung bai hoac tiep tuc Prompt Lab.</p>
       <div className="hero-actions" style={{ marginTop: "18px" }}>
         <Link href="/missions" className="button-primary">
-          Về lộ trình
+          Stage map
         </Link>
         <Link href="/prompt-lab" className="button-secondary">
-          Mở Prompt Lab
+          Prompt Lab
         </Link>
       </div>
     </section>

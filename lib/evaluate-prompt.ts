@@ -21,9 +21,9 @@ export type PromptEvaluation = {
 };
 
 const BOT_HINTS: Record<string, string[]> = {
-  linux_main: ["deploy", "runtime", "integration", "supervisor", "orchestr", "coord", "report"],
-  lavis_linux: ["analysis", "phan tich", "review", "spec", "root cause", "kien truc", "architecture"],
-  gaubot: ["implement", "fix", "code", "docker-compose", "refactor", "patch", "build"],
+  linux_main: ["audit", "production", "runtime", "deploy", "revalidate", "integration", "report", "checkpoint verdict"],
+  lavis_linux: ["analysis", "phan tich", "review", "spec", "root cause", "kien truc", "architecture", "new-phase", "contained-fix"],
+  gaubot: ["implement", "fix", "code", "branch", "checkpoint", "candidate summary", "patch", "build", "executor"],
 };
 
 function scoreBotFit(selectedBot: string, normalizedPrompt: string) {
@@ -31,7 +31,7 @@ function scoreBotFit(selectedBot: string, normalizedPrompt: string) {
     return {
       score: 10,
       status: "warn" as const,
-      message: "Bạn chưa chọn bot, nên Prompt Lab chưa thể chấm đầy đủ mức độ phù hợp.",
+      message: "Chua chon bot, nen Prompt Lab khong the cham bot fit day du.",
     };
   }
 
@@ -42,14 +42,14 @@ function scoreBotFit(selectedBot: string, normalizedPrompt: string) {
     return {
       score: 24,
       status: "pass" as const,
-      message: `Nội dung hiện tại khá hợp với vai trò chính của ${selectedBot}.`,
+      message: `Bot ${selectedBot} co dau hieu phu hop voi task text hien tai.`,
     };
   }
 
   return {
     score: 8,
     status: "warn" as const,
-    message: `Prompt chưa cho thấy rõ vì sao ${selectedBot} là bot phù hợp nhất cho việc này.`,
+    message: `Task text chua goi len kha nang cot loi cua ${selectedBot}. Kiem tra lai bot routing.`,
   };
 }
 
@@ -84,15 +84,15 @@ export function evaluatePrompt(promptText: string, selectedBot: string) {
     rubric.push({
       id: "codex-directive",
       status: "pass",
-      message: "Bạn đã nói rõ muốn bot phối hợp với Codex.",
+      message: "Prompt noi ro muon bot tro chuyen voi Codex.",
     });
   } else {
     rubric.push({
       id: "codex-directive",
       status: "fail",
-      message: "Prompt chưa nói rõ bot cần trò chuyện với Codex.",
+      message: "Chua noi ro muon bot tro chuyen voi Codex.",
     });
-    rewriteSuggestions.push("Thêm dòng mở đầu như: '@bot hãy trò chuyện với Codex và xử lý việc này.'");
+    rewriteSuggestions.push("Them dong mo dau: '@bot hay tro chuyen voi codex va xu ly viec nay.'");
   }
 
   if (hasRepo) {
@@ -100,15 +100,15 @@ export function evaluatePrompt(promptText: string, selectedBot: string) {
     rubric.push({
       id: "repo",
       status: "pass",
-      message: "Repo đã được nêu rõ nên hidden system không phải đoán phạm vi.",
+      message: "Prompt da co repo de hidden system khong phai doan pham vi.",
     });
   } else {
     rubric.push({
       id: "repo",
       status: "fail",
-      message: "Prompt đang thiếu repo. Đây là lý do rất hay khiến supervisor phải hỏi lại sớm.",
+      message: "Thieu repo. Day la ly do pho bien khien supervisor hoi nguoc som.",
     });
-    rewriteSuggestions.push("Thêm dòng 'Repo: <tên-repo>' để dispatcher có điểm đến rõ ràng.");
+    rewriteSuggestions.push("Them dong 'Repo: <ten-repo>' de dispatcher co diem den ro.");
   }
 
   if (hasGoal) {
@@ -116,15 +116,15 @@ export function evaluatePrompt(promptText: string, selectedBot: string) {
     rubric.push({
       id: "goal",
       status: "pass",
-      message: "Mục tiêu đầu ra đã được nêu khá rõ.",
+      message: "Prompt da noi ro outcome can chot.",
     });
   } else {
     rubric.push({
       id: "goal",
       status: "fail",
-      message: "Mục tiêu chưa rõ nên prompt rất dễ rơi vào kiểu 'check giúp tôi'.",
+      message: "Muc tieu chua ro. Prompt de roi vao vung 'check giup toi'.",
     });
-    rewriteSuggestions.push("Thêm 'Mục tiêu: <goal cụ thể, có điểm dừng rõ ràng>'.");
+    rewriteSuggestions.push("Them 'Muc tieu: <goal cu the, co diem dung ro rang>'.");
   }
 
   const contextSafety = clamp(
@@ -137,22 +137,22 @@ export function evaluatePrompt(promptText: string, selectedBot: string) {
     rubric.push({
       id: "context-safety",
       status: "fail",
-      message: "Prompt vừa nói 'cùng issue này' vừa nói 'issue mới', nên context sẽ bị xung đột.",
+      message: "Prompt vua noi 'cung issue nay' vua noi 'issue moi', context se bi conflict.",
     });
-    rewriteSuggestions.push("Chỉ giữ một trong hai ý: 'cùng issue này' hoặc 'đây là issue mới'.");
+    rewriteSuggestions.push("Chi giu mot trong hai: 'cung issue nay' hoac 'day la issue moi'.");
   } else if (mentionsContinueIssue || mentionsNewIssue) {
     rubric.push({
       id: "context-safety",
       status: "pass",
-      message: "Issue boundary đã rõ nên nguy cơ context drift thấp hơn nhiều.",
+      message: "Prompt da noi ro issue boundary, giam nguy co context drift.",
     });
   } else {
     rubric.push({
       id: "context-safety",
       status: "warn",
-      message: "Prompt chưa nói rõ đây là issue cũ hay issue mới. Trong section cũ, điều này rất dễ gây resume nhầm.",
+      message: "Prompt chua noi ro issue moi hay issue cu. O section cu, day co the gay resume nham.",
     });
-    rewriteSuggestions.push("Nếu đang tiếp tục việc cũ, thêm 'cùng issue này'. Nếu mở việc mới, thêm 'đây là issue mới'.");
+    rewriteSuggestions.push("Neu dang tiep tuc viec cu, them 'cung issue nay'. Neu mo viec moi, them 'day la issue moi'.");
   }
 
   const operationalControl = hasRule ? 26 : 8;
@@ -160,15 +160,15 @@ export function evaluatePrompt(promptText: string, selectedBot: string) {
     rubric.push({
       id: "rule",
       status: "pass",
-      message: "Prompt đã có rule đủ rõ để supervisor biết khi nào nên tự loop và khi nào phải dừng.",
+      message: "Prompt da co stop rule/autonomy rule cho supervisor loop.",
     });
   } else {
     rubric.push({
       id: "rule",
       status: "warn",
-      message: "Prompt chưa có stop rule rõ, nên bot dễ hỏi lại quá sớm hoặc dừng giữa chừng.",
+      message: "Thieu rule dung. Bot de bao non hon vi khong biet khi nao duoc tiep tuc.",
     });
-    rewriteSuggestions.push("Thêm 'Rule: chỉ hỏi tôi nếu thật sự bị chặn hoặc cần business decision'.");
+    rewriteSuggestions.push("Them 'Rule: chi hoi toi neu blocked that hoac can business decision'.");
   }
 
   const botFitResult = scoreBotFit(selectedBot, normalizedPrompt);
@@ -198,8 +198,8 @@ export function evaluatePrompt(promptText: string, selectedBot: string) {
     scoreTotal >= 85 ? "Excellent" : scoreTotal >= 70 ? "Good" : scoreTotal >= 48 ? "Needs work" : "Unsafe";
 
   const systemInterpretation = hasRepo && hasGoal
-    ? "Hệ thống đã có đủ repo và mục tiêu để tạo hoặc tiếp tục ticket. Tiếp theo, supervisor sẽ dựa vào issue boundary và rule dừng để quyết định cách loop."
-    : "Supervisor nhiều khả năng sẽ phải hỏi lại sớm vì prompt chưa đủ repo hoặc mục tiêu để route an toàn.";
+    ? "He thong co du scope de tao hoac resume ticket, nhung van se xem issue boundary, gate hien tai va stop rule truoc khi loop."
+    : "Supervisor co kha nang hoi lai som vi prompt chua du repo/goal de route an toan.";
 
   return {
     band,

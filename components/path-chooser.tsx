@@ -19,17 +19,17 @@ export function PathChooser({ paths }: { paths: LearningPath[] }) {
             void recordEvent("path_focus", { pathSlug: path.slug });
           }}
         >
-          <p className="eyebrow">Gợi ý</p>
+          <p className="eyebrow">Recommended</p>
           <h3 className="mission-title">{path.title}</h3>
           <p className="mission-summary" style={{ marginTop: "8px" }}>
             {path.summary}
           </p>
           <p className="muted-copy" style={{ marginTop: "12px" }}>
-            Phù hợp với: {path.recommendedFor}
+            Hop voi: {path.recommendedFor}
           </p>
           <div className="chip-row" style={{ marginTop: "16px" }}>
-            <span className="chip">{path.primaryMissionSlugs.length} nhiệm vụ</span>
-            {hydrated && activePathSlug === path.slug ? <span className="status-chip">Đang theo</span> : null}
+            <span className="chip">{path.primaryMissionSlugs.length} missions</span>
+            {hydrated && activePathSlug === path.slug ? <span className="status-chip">Dang theo</span> : null}
           </div>
         </button>
       ))}

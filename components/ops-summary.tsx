@@ -26,34 +26,34 @@ export function OpsSummary() {
   }, []);
 
   if (!payload) {
-    return <div className="empty-state">Đang tải dữ liệu vận hành...</div>;
+    return <div className="empty-state">Dang tai ops summary...</div>;
   }
 
   return (
     <div className="ops-grid">
       <article className="ops-card">
-        <p className="micro-label">Tổng quan telemetry</p>
+        <p className="micro-label">Telemetry snapshot</p>
         <div className="stats-grid" style={{ marginTop: "18px" }}>
           <div className="stat-card">
-            <p className="stat-label">Người dùng đang hoạt động</p>
+            <p className="stat-label">Active users</p>
             <p className="stat-value">{payload.activeUsers}</p>
           </div>
           <div className="stat-card">
-            <p className="stat-label">Nhiệm vụ đã hoàn thành</p>
+            <p className="stat-label">Completed missions</p>
             <p className="stat-value">{payload.completedMissionCount}</p>
           </div>
           <div className="stat-card">
-            <p className="stat-label">Sự kiện đã ghi nhận</p>
+            <p className="stat-label">Events</p>
             <p className="stat-value">{payload.totalEvents}</p>
           </div>
         </div>
       </article>
 
       <article className="ops-card">
-        <p className="micro-label">Nhóm sự kiện nổi bật</p>
+        <p className="micro-label">Top event types</p>
         <div className="list-stack" style={{ marginTop: "16px" }}>
           {Object.entries(payload.eventCountByType).length === 0 ? (
-            <div className="empty-state">Chưa có sự kiện nào.</div>
+            <div className="empty-state">Chua co event nao.</div>
           ) : (
             Object.entries(payload.eventCountByType).map(([event, count]) => (
               <div key={event} className="timeline-card" data-tone="neutral">
@@ -68,10 +68,10 @@ export function OpsSummary() {
       </article>
 
       <article className="ops-card" style={{ gridColumn: "1 / -1" }}>
-        <p className="micro-label">Sự kiện gần đây</p>
+        <p className="micro-label">Recent events</p>
         <div className="list-stack" style={{ marginTop: "16px" }}>
           {payload.recentEvents.length === 0 ? (
-            <div className="empty-state">Chưa có sự kiện nào được ghi nhận.</div>
+            <div className="empty-state">Chua co event nao duoc ghi nhan.</div>
           ) : (
             payload.recentEvents.map((event) => (
               <div key={event.id} className="timeline-card" data-tone="neutral">
@@ -80,7 +80,7 @@ export function OpsSummary() {
                   <span className="muted-copy">{new Date(event.createdAt).toLocaleString()}</span>
                 </div>
                 <p className="muted-copy" style={{ marginTop: "8px" }}>
-                  Người dùng: {event.userId}
+                  userId: {event.userId}
                 </p>
               </div>
             ))

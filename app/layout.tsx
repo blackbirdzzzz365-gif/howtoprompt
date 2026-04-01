@@ -6,9 +6,9 @@ import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OpenClaw x Codex | Học viện Mission Control",
+  title: "OpenClaw x Codex Operator Campaign",
   description:
-    "Trang web tương tác giúp bạn học cách dùng OpenClaw x Codex qua lộ trình nhiệm vụ, Prompt Lab và mô phỏng tình huống.",
+    "Interactive handbook de hoc va choi dung product loop OpenClaw x Codex tren runtime Linux VM that.",
 };
 
 export default function RootLayout({
@@ -26,27 +26,30 @@ export default function RootLayout({
             <main className="page-frame">{children}</main>
             <footer className="site-footer">
               <div>
-                <p className="eyebrow">Học viện Mission Control</p>
+                <p className="eyebrow">Operator Campaign</p>
                 <p className="footer-copy">
-                  Nội dung được xây dựng từ{" "}
+                  Duoc xay tu{" "}
                   <Link href="/missions" className="inline-link">
-                    6 nhiệm vụ
+                    6 stages
                   </Link>{" "}
-                  và guide gốc để bạn có thể hiểu hệ thống, viết prompt đúng và vào việc nhanh hơn.
+                  va guide authoritative de day owner dung product loop dung gate va dung bot.
                 </p>
               </div>
               <div className="footer-links">
                 <Link href="/prompt-lab" className="inline-link">
                   Prompt Lab
                 </Link>
+                <Link href="/social-listening-arena" className="inline-link">
+                  SL Arena
+                </Link>
                 <Link href="/simulator" className="inline-link">
-                  Mô phỏng
+                  Simulator
                 </Link>
                 <Link href="/quick-ref" className="inline-link">
-                  Thẻ nhắc
+                  Quick Ref
                 </Link>
                 <Link href="/ops" className="inline-link">
-                  Vận hành
+                  Ops
                 </Link>
               </div>
             </footer>
