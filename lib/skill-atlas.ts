@@ -1,5 +1,9 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import {
+  defaultSkillAtlasCatalogId,
+  type SkillAtlasCatalogId,
+} from "@/lib/skill-atlas-catalogs";
 
 export type SkillReferenceDoc = {
   id: string;
@@ -48,6 +52,9 @@ export type SkillAtlasSkill = {
 };
 
 export type SkillAtlasDb = {
+  atlasId: SkillAtlasCatalogId;
+  atlasLabel: string;
+  atlasDescription: string;
   generatedAt: string;
   sourceRoots: Array<{
     id: string;
@@ -68,22 +75,32 @@ export type SkillAtlasListItem = Omit<SkillAtlasSkill, "raw" | "referencedDocs" 
   referencedDocCount: number;
 };
 
-const atlasPath = path.join(process.cwd(), "data", "skill-atlas.generated.json");
+const atlasFiles: Record<SkillAtlasCatalogId, string> = {
+  "host-codex": "skill-atlas.host-codex.generated.json",
+  "linuxvm-codex": "skill-atlas.linuxvm-codex.generated.json",
+  "linuxvm-openclaw": "skill-atlas.linuxvm-openclaw.generated.json",
+};
 
-let cachedAtlas: SkillAtlasDb | null = null;
+const cachedAtlases = new Map<SkillAtlasCatalogId, SkillAtlasDb>();
 
-export async function getSkillAtlas() {
-  if (cachedAtlas) {
-    return cachedAtlas;
-  }
-
-  const raw = await fs.readFile(atlasPath, "utf8");
-  cachedAtlas = JSON.parse(raw) as SkillAtlasDb;
-  return cachedAtlas;
+function getAtlasPath(atlasId: SkillAtlasCatalogId) {
+  return path.join(process.cwd(), "data", atlasFiles[atlasId]);
 }
 
-export async function getSkillAtlasList() {
-  const atlas = await getSkillAtlas();
+export async function getSkillAtlas(atlasId: SkillAtlasCatalogId = defaultSkillAtlasCatalogId) {
+  const cached = cachedAtlases.get(atlasId);
+  if (cached) {
+    return cached;
+  }
+
+  const raw = await fs.readFile(getAtlasPath(atlasId), "utf8");
+  const parsed = JSON.parse(raw) as SkillAtlasDb;
+  cachedAtlases.set(atlasId, parsed);
+  return parsed;
+}
+
+export async function getSkillAtlasList(atlasId: SkillAtlasCatalogId = defaultSkillAtlasCatalogId) {
+  const atlas = await getSkillAtlas(atlasId);
   return atlas.skills.map((skill) => ({
     slug: skill.slug,
     name: skill.name,
@@ -110,13 +127,29 @@ export async function getSkillAtlasList() {
   }));
 }
 
-export async function getSkillBySlug(slug: string) {
-  const atlas = await getSkillAtlas();
+export async function getSkillBySlug(
+  atlasIdOrSlug: SkillAtlasCatalogId | string = defaultSkillAtlasCatalogId,
+  maybeSlug?: string,
+) {
+  const atlasId = maybeSlug
+    ? (atlasIdOrSlug as SkillAtlasCatalogId)
+    : defaultSkillAtlasCatalogId;
+  const slug = maybeSlug ?? atlasIdOrSlug;
+  const atlas = await getSkillAtlas(atlasId);
   return atlas.skills.find((skill) => skill.slug === slug) ?? null;
 }
 
-export async function getSkillReferenceDoc(slug: string, refId: string) {
-  const skill = await getSkillBySlug(slug);
+export async function getSkillReferenceDoc(
+  atlasIdOrSlug: SkillAtlasCatalogId | string = defaultSkillAtlasCatalogId,
+  slugOrRefId: string,
+  maybeRefId?: string,
+) {
+  const atlasId = maybeRefId
+    ? (atlasIdOrSlug as SkillAtlasCatalogId)
+    : defaultSkillAtlasCatalogId;
+  const slug = maybeRefId ? slugOrRefId : atlasIdOrSlug;
+  const refId = maybeRefId ?? slugOrRefId;
+  const skill = await getSkillBySlug(atlasId, slug);
   if (!skill) {
     return null;
   }
@@ -167,8 +200,21 @@ export function scoreSkillMatch(skill: SkillAtlasSkill, userNeed: string) {
   return score;
 }
 
-export async function shortlistSkills(userNeed: string, limit = 8) {
-  const atlas = await getSkillAtlas();
+export async function shortlistSkills(
+  atlasIdOrUserNeed: SkillAtlasCatalogId | string = defaultSkillAtlasCatalogId,
+  userNeedOrLimit?: string | number,
+  maybeLimit = 8,
+) {
+  const atlasId =
+    typeof userNeedOrLimit === "string"
+      ? (atlasIdOrUserNeed as SkillAtlasCatalogId)
+      : defaultSkillAtlasCatalogId;
+  const userNeed =
+    typeof userNeedOrLimit === "string"
+      ? userNeedOrLimit
+      : (atlasIdOrUserNeed as string);
+  const limit = typeof userNeedOrLimit === "number" ? userNeedOrLimit : maybeLimit;
+  const atlas = await getSkillAtlas(atlasId);
   return [...atlas.skills]
     .map((skill) => ({ skill, score: scoreSkillMatch(skill, userNeed) }))
     .filter((entry) => entry.score > 0)

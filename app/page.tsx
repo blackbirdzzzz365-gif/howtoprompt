@@ -155,7 +155,10 @@ export default function HomePage() {
             Enter social listening arena
           </Link>
           <Link href="/social-listening-arena/skills" className="button-secondary">
-            Open skill atlas
+            Codex host atlas
+          </Link>
+          <Link href="/social-listening-arena/skills-vm-codex" className="button-secondary">
+            Codex linuxvm atlas
           </Link>
         </div>
       </section>

@@ -1,11 +1,13 @@
 import { SkillAtlasDirectory } from "@/components/skill-atlas-directory";
-import { defaultSkillAtlasCatalogId, getSkillAtlasCatalog, listSkillAtlasCatalogs } from "@/lib/skill-atlas-catalogs";
+import { getSkillAtlasCatalog, listSkillAtlasCatalogs, type SkillAtlasCatalogId } from "@/lib/skill-atlas-catalogs";
 import { getSkillAtlas, getSkillAtlasList } from "@/lib/skill-atlas";
 
-export default async function SkillAtlasPage() {
-  const catalog = getSkillAtlasCatalog(defaultSkillAtlasCatalogId);
-  const atlas = await getSkillAtlas(defaultSkillAtlasCatalogId);
-  const skills = await getSkillAtlasList(defaultSkillAtlasCatalogId);
+const catalogId: SkillAtlasCatalogId = "linuxvm-openclaw";
+
+export default async function LinuxVmOpenClawSkillAtlasPage() {
+  const catalog = getSkillAtlasCatalog(catalogId);
+  const atlas = await getSkillAtlas(catalogId);
+  const skills = await getSkillAtlasList(catalogId);
   const categories = [...new Set(skills.map((skill) => skill.category))].sort((left, right) =>
     left.localeCompare(right),
   );
@@ -26,3 +28,4 @@ export default async function SkillAtlasPage() {
     />
   );
 }
+

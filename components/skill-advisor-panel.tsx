@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
+import { getSkillAtlasCatalog, type SkillAtlasCatalogId } from "@/lib/skill-atlas-catalogs";
+import { localizeCategory } from "@/lib/skill-atlas-ui";
 
 type AdvisorSkill = {
   slug: string;
@@ -24,8 +26,17 @@ type ShortlistItem = {
   category: string;
 };
 
-export function SkillAdvisorPanel() {
-  const storageScope = "skill-atlas-advisor";
+export function SkillAdvisorPanel({
+  catalogId,
+  apiBasePath,
+  detailBasePath,
+}: {
+  catalogId: SkillAtlasCatalogId;
+  apiBasePath: string;
+  detailBasePath: string;
+}) {
+  const storageScope = `skill-atlas-advisor:${catalogId}`;
+  const catalog = getSkillAtlasCatalog(catalogId);
   const [apiKey, setApiKey] = useState("");
   const [resolvedModel, setResolvedModel] = useState("");
   const [need, setNeed] = useState("");
@@ -61,7 +72,7 @@ export function SkillAdvisorPanel() {
     setProviderError("");
 
     try {
-      const response = await fetch("/api/skill-atlas/advice", {
+      const response = await fetch(`${apiBasePath}/advice`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -98,11 +109,11 @@ export function SkillAdvisorPanel() {
     <section className="tool-card">
       <p className="micro-label">AI Skill Advisor</p>
       <h2 className="mission-title" style={{ marginTop: "8px" }}>
-        Nhập mong muốn, AI sẽ gợi ý bộ skill nên dùng
+        Nhập mong muốn, AI sẽ gợi ý bộ skill nên dùng trong catalog này
       </h2>
       <p className="mission-summary" style={{ marginTop: "10px" }}>
         API key `chiasegpu` được lưu riêng cho khu vực này trong trình duyệt của bạn. Hệ thống sẽ tự chọn model phù hợp,
-        bạn không cần nhập tay.
+        bạn không cần nhập tay. Catalog đang xem là {catalog?.shortTitle ?? catalogId}.
       </p>
 
       <form className="list-stack" style={{ marginTop: "16px" }} onSubmit={handleSubmit}>
@@ -175,7 +186,7 @@ export function SkillAdvisorPanel() {
                       {skill.reason_vi}
                     </p>
                     <div className="detail-actions" style={{ marginTop: "14px" }}>
-                      <Link href={`/social-listening-arena/skills/${skill.slug}`} className="button-secondary">
+                      <Link href={`${detailBasePath}/${skill.slug}`} className="button-secondary">
                         Xem skill này
                       </Link>
                     </div>
@@ -231,21 +242,4 @@ export function SkillAdvisorPanel() {
 
 function getStorageKey(scope: string, field: string) {
   return `skill-atlas:${scope}:${field}`;
-}
-
-function localizeCategory(category: string) {
-  const categoryMap: Record<string, string> = {
-    "Architecture / Engineering": "Kiến trúc / Kỹ thuật",
-    "Blackbird Platform": "Nền tảng Blackbird",
-    "Codex System": "Hệ thống Codex",
-    "General Engineering": "Kỹ thuật tổng quát",
-    "OpenClaw / VM": "OpenClaw / VM",
-    "Plugin GitHub": "Plugin GitHub",
-    "Plugin Canva": "Plugin Canva",
-    "Plugin Skills": "Plugin",
-    "Product / Analysis": "Sản phẩm / Phân tích",
-    "Social Listening v3": "Social Listening v3",
-  };
-
-  return categoryMap[category] || category;
 }

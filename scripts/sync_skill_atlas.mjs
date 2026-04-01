@@ -1,37 +1,16 @@
 #!/usr/bin/env node
 
+import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 
 const repoRoot = process.cwd();
-const outputPath = path.join(repoRoot, "data", "skill-atlas.generated.json");
+const dataDir = path.join(repoRoot, "data");
+const cacheRoot = path.join(repoRoot, ".cache", "skill-atlas");
+const legacyHostOutputPath = path.join(dataDir, "skill-atlas.generated.json");
+const localPluginCacheRoot = "/Users/nguyenquocthong/.codex/plugins/cache/openai-curated";
 
-const sourceRoots = [
-  {
-    id: "installed",
-    label: "Installed Codex Skills",
-    kind: "installed",
-    priority: 400,
-    root: "/Users/nguyenquocthong/.codex/skills",
-  },
-  {
-    id: "global",
-    label: "Global Team Skills",
-    kind: "global",
-    priority: 320,
-    root: "/Users/nguyenquocthong/claude-config/global/plugins/codex-skills/skills",
-  },
-  {
-    id: "blackbird-repo",
-    label: "Blackbird Repo Skills",
-    kind: "project",
-    priority: 240,
-    root: "/Users/nguyenquocthong/project/blackbirdzzzz.art/skills",
-  },
-];
-
-const pluginCacheRoot = "/Users/nguyenquocthong/.codex/plugins/cache/openai-curated";
 const referenceExtensions = new Set([
   ".md",
   ".mdx",
@@ -53,47 +32,156 @@ const referenceExtensions = new Set([
 const maxReferenceChars = 60_000;
 const maxSearchSnippetChars = 6_000;
 
+const catalogs = [
+  {
+    id: "host-codex",
+    label: "Codex tren host",
+    description:
+      "Snapshot tu bo skill Codex dang co tren may host hien tai, gom skill cai trong Codex, skill team va plugin lien quan.",
+    outputFile: "skill-atlas.host-codex.generated.json",
+    async resolveSources() {
+      const baseSources = [
+        {
+          id: "installed",
+          label: "Installed Codex Skills",
+          kind: "installed",
+          priority: 400,
+          root: "/Users/nguyenquocthong/.codex/skills",
+        },
+        {
+          id: "global",
+          label: "Global Team Skills",
+          kind: "global",
+          priority: 320,
+          root: "/Users/nguyenquocthong/claude-config/global/plugins/codex-skills/skills",
+        },
+        {
+          id: "blackbird-repo",
+          label: "Blackbird Repo Skills",
+          kind: "project",
+          priority: 240,
+          root: "/Users/nguyenquocthong/project/blackbirdzzzz.art/skills",
+        },
+      ];
+
+      return [...baseSources, ...(await discoverLocalPluginSources(localPluginCacheRoot))];
+    },
+  },
+  {
+    id: "linuxvm-codex",
+    label: "Codex tren linuxvm",
+    description:
+      "Snapshot tu bundle skill Codex tren linuxvm, phan anh dung bo skill ma Codex CLI va bot tren may Linux dang dung.",
+    outputFile: "skill-atlas.linuxvm-codex.generated.json",
+    remoteHost: "linuxvm",
+    async resolveSources() {
+      const baseSources = [
+        {
+          id: "linuxvm-installed",
+          label: "Linux VM Codex Skills",
+          kind: "installed",
+          priority: 420,
+          root: "/home/blackbird/.codex/skills",
+        },
+      ];
+
+      return [...baseSources, ...(await discoverRemotePluginSources("linuxvm"))];
+    },
+  },
+  {
+    id: "linuxvm-openclaw",
+    label: "OpenClaw tren linuxvm",
+    description:
+      "Snapshot tu bundle skill OpenClaw tren linuxvm, gom skill custom, builtin va workspace overlay ma bot dang nap trong runtime.",
+    outputFile: "skill-atlas.linuxvm-openclaw.generated.json",
+    remoteHost: "linuxvm",
+    async resolveSources() {
+      const baseSources = [
+        {
+          id: "linuxvm-openclaw-custom",
+          label: "Linux VM OpenClaw Skills",
+          kind: "openclaw-custom",
+          priority: 420,
+          root: "/home/blackbird/.openclaw/skills",
+        },
+        {
+          id: "linuxvm-openclaw-builtin",
+          label: "Linux VM OpenClaw Built-ins",
+          kind: "openclaw-builtin",
+          priority: 320,
+          root: "/home/blackbird/.openclaw/skills-builtin",
+        },
+      ];
+
+      return [...baseSources, ...(await discoverRemoteOpenClawWorkspaceSources("linuxvm"))];
+    },
+  },
+];
+
 async function main() {
-  const discoveredPluginSources = await discoverPluginSources();
-  const sources = [...sourceRoots, ...discoveredPluginSources];
-  const skillFiles = await discoverSkillFiles(sources);
-  const rawSkills = await Promise.all(skillFiles.map((entry) => buildSkillRecord(entry, sources)));
-  const deduped = dedupeSkills(rawSkills);
-  const finalized = finalizeRelatedSkills(deduped);
-  const stats = finalized.reduce(
-    (accumulator, skill) => {
-      accumulator.referenceCount += skill.referencedDocs.length;
-      accumulator.rawByteCount += Buffer.byteLength(skill.raw, "utf8");
-      return accumulator;
-    },
-    { referenceCount: 0, rawByteCount: 0 },
-  );
+  await fs.mkdir(dataDir, { recursive: true });
+  await fs.mkdir(cacheRoot, { recursive: true });
 
-  const payload = {
-    generatedAt: new Date().toISOString(),
-    sourceRoots: sources.map((source) => ({
-      id: source.id,
-      label: source.label,
-      kind: source.kind,
-      root: source.root,
-      priority: source.priority,
-    })),
-    stats: {
-      skillCount: finalized.length,
-      referenceCount: stats.referenceCount,
-      rawByteCount: stats.rawByteCount,
-    },
-    skills: finalized,
-  };
+  const summaries = [];
 
-  await fs.mkdir(path.dirname(outputPath), { recursive: true });
-  await fs.writeFile(outputPath, JSON.stringify(payload, null, 2), "utf8");
-  process.stdout.write(
-    `Wrote ${finalized.length} skills and ${stats.referenceCount} referenced docs to ${outputPath}\n`,
-  );
+  for (const catalog of catalogs) {
+    const rawSources = await catalog.resolveSources();
+    const sources = catalog.remoteHost
+      ? await mirrorRemoteSources(catalog.id, catalog.remoteHost, rawSources)
+      : rawSources.map((source) => ({ ...source, logicalRoot: source.root }));
+
+    const skillFiles = await discoverSkillFiles(sources);
+    const pathMappings = sources
+      .filter((source) => source.logicalRoot && source.logicalRoot !== source.root)
+      .map((source) => ({ realRoot: source.root, logicalRoot: source.logicalRoot }));
+    const rawSkills = await Promise.all(
+      skillFiles.map((entry) => buildSkillRecord(entry, sources, pathMappings)),
+    );
+    const deduped = dedupeSkills(rawSkills);
+    const finalized = finalizeRelatedSkills(deduped);
+    const stats = finalized.reduce(
+      (accumulator, skill) => {
+        accumulator.referenceCount += skill.referencedDocs.length;
+        accumulator.rawByteCount += Buffer.byteLength(skill.raw, "utf8");
+        return accumulator;
+      },
+      { referenceCount: 0, rawByteCount: 0 },
+    );
+
+    const payload = {
+      atlasId: catalog.id,
+      atlasLabel: catalog.label,
+      atlasDescription: catalog.description,
+      generatedAt: new Date().toISOString(),
+      sourceRoots: sources.map((source) => ({
+        id: source.id,
+        label: source.label,
+        kind: source.kind,
+        root: source.logicalRoot || source.root,
+        priority: source.priority,
+      })),
+      stats: {
+        skillCount: finalized.length,
+        referenceCount: stats.referenceCount,
+        rawByteCount: stats.rawByteCount,
+      },
+      skills: finalized,
+    };
+
+    const outputPath = path.join(dataDir, catalog.outputFile);
+    await fs.writeFile(outputPath, JSON.stringify(payload, null, 2), "utf8");
+
+    if (catalog.id === "host-codex") {
+      await fs.writeFile(legacyHostOutputPath, JSON.stringify(payload, null, 2), "utf8");
+    }
+
+    summaries.push(`${catalog.id}: ${finalized.length} skills / ${stats.referenceCount} refs`);
+  }
+
+  process.stdout.write(`Synced ${summaries.length} catalogs\n${summaries.join("\n")}\n`);
 }
 
-async function discoverPluginSources() {
+async function discoverLocalPluginSources(pluginCacheRoot) {
   const sources = [];
   try {
     const pluginDirs = await fs.readdir(pluginCacheRoot, { withFileTypes: true });
@@ -127,6 +215,88 @@ async function discoverPluginSources() {
   return sources;
 }
 
+async function discoverRemotePluginSources(host) {
+  const pluginCacheRoot = "/home/blackbird/.codex/plugins/cache/openai-curated";
+  const output = await runCommand("ssh", [
+    "-o",
+    "BatchMode=yes",
+    host,
+    `if [ -d '${pluginCacheRoot}' ]; then find '${pluginCacheRoot}' -mindepth 3 -maxdepth 3 -type d -name skills -print; fi`,
+  ]);
+
+  const skillsRoots = output
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return skillsRoots.map((skillsRoot) => {
+    const relative = path.relative(pluginCacheRoot, skillsRoot).split(path.sep);
+    const pluginId = relative[0] || "plugin";
+    return {
+      id: `linuxvm-plugin:${pluginId}`,
+      label: `${capitalize(pluginId)} Plugin Skills`,
+      kind: "plugin",
+      pluginId,
+      priority: 360,
+      root: skillsRoot,
+    };
+  });
+}
+
+async function discoverRemoteOpenClawWorkspaceSources(host) {
+  const output = await runCommand("ssh", [
+    "-o",
+    "BatchMode=yes",
+    host,
+    `find /home/blackbird/.openclaw -maxdepth 1 -type d -name 'workspace-*' -print`,
+  ]);
+
+  return output
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((workspaceRoot) => ({
+      id: `linuxvm-openclaw-workspace:${path.basename(workspaceRoot)}`,
+      label: "Linux VM OpenClaw Workspace Skills",
+      kind: "openclaw-workspace",
+      priority: 520,
+      root: path.join(workspaceRoot, "skills"),
+    }));
+}
+
+async function mirrorRemoteSources(catalogId, host, sources) {
+  const prepared = [];
+
+  for (const source of sources) {
+    const remoteExists = await runCommand("ssh", [
+      "-o",
+      "BatchMode=yes",
+      host,
+      `[ -d '${source.root}' ] && printf yes || printf no`,
+    ]);
+    if (remoteExists.trim() !== "yes") {
+      continue;
+    }
+
+    const mirrorRoot = path.join(cacheRoot, catalogId, source.root.replace(/^\/+/, ""));
+    await fs.mkdir(mirrorRoot, { recursive: true });
+    await runCommand("rsync", [
+      "-az",
+      "--delete",
+      `${host}:${source.root}/`,
+      `${mirrorRoot}/`,
+    ]);
+
+    prepared.push({
+      ...source,
+      root: mirrorRoot,
+      logicalRoot: source.root,
+    });
+  }
+
+  return prepared;
+}
+
 async function discoverSkillFiles(sources) {
   const found = [];
   for (const source of sources) {
@@ -144,27 +314,40 @@ async function discoverSkillFiles(sources) {
           continue;
         }
         if (entry.isFile() && entry.name === "SKILL.md") {
-          found.push({ sourceId: source.id, skillPath: target });
+          found.push({
+            sourceId: source.id,
+            skillPath: target,
+            logicalSkillPath: toLogicalPath(target, source),
+          });
         }
       }
     }
   }
 
-  return found.sort((left, right) => left.skillPath.localeCompare(right.skillPath));
+  return found.sort((left, right) => left.logicalSkillPath.localeCompare(right.logicalSkillPath));
 }
 
-async function buildSkillRecord(entry, sources) {
+async function buildSkillRecord(entry, sources, pathMappings) {
   const source = sources.find((item) => item.id === entry.sourceId);
   const raw = await fs.readFile(entry.skillPath, "utf8");
   const frontmatter = parseFrontmatter(raw);
   const skillDir = path.dirname(entry.skillPath);
+  const logicalSkillPath = entry.logicalSkillPath || entry.skillPath;
+  const logicalSkillDir = path.dirname(logicalSkillPath);
   const skillName = (frontmatter.name || path.basename(skillDir)).trim();
   const displayName = source.kind === "plugin" ? `${source.pluginId}:${skillName}` : skillName;
   const triggerPhrases = unique(extractQuotedPhrases(frontmatter.description || raw)).slice(0, 16);
   const heading = extractHeading(raw) || skillName;
   const workflowHighlights = extractNumberedSteps(raw).slice(0, 8);
   const guardrails = extractSectionBullets(raw, ["Rule", "Rules", "Guardrails", "Write Safety"]).slice(0, 8);
-  const referencedDocs = await collectReferencedDocs({ raw, skillDir, skillPath: entry.skillPath });
+  const referencedDocs = await collectReferencedDocs({
+    raw,
+    skillDir,
+    logicalSkillDir,
+    skillPath: entry.skillPath,
+    logicalSkillPath,
+    pathMappings,
+  });
 
   const record = {
     slug: toSlug(displayName),
@@ -174,9 +357,9 @@ async function buildSkillRecord(entry, sources) {
     description: (frontmatter.description || "").trim(),
     sourceKind: source.kind,
     sourceLabel: source.label,
-    sourcePath: entry.skillPath,
-    allSourcePaths: [entry.skillPath],
-    directory: skillDir,
+    sourcePath: logicalSkillPath,
+    allSourcePaths: [logicalSkillPath],
+    directory: logicalSkillDir,
     category: inferCategory(displayName, source),
     isAlias: /^alias\b/i.test(frontmatter.description || ""),
     summaryVi: inferSummaryVi(displayName, frontmatter.description || "", heading, workflowHighlights),
@@ -274,7 +457,13 @@ function mentionsSkill(skill, candidateSkill, candidateName) {
   return patterns.some((pattern) => pattern.test(skill.raw));
 }
 
-async function collectReferencedDocs({ raw, skillDir, skillPath }) {
+async function collectReferencedDocs({
+  raw,
+  skillDir,
+  logicalSkillDir,
+  logicalSkillPath,
+  pathMappings,
+}) {
   const discovered = new Map();
   const referencesDir = path.join(skillDir, "references");
   const repoHints = deriveRepoHints(raw);
@@ -282,7 +471,12 @@ async function collectReferencedDocs({ raw, skillDir, skillPath }) {
   if (await fileExists(referencesDir)) {
     const files = await walkFiles(referencesDir);
     for (const filePath of files) {
-      discovered.set(filePath, { rawToken: path.relative(skillDir, filePath), kind: "references-dir" });
+      discovered.set(filePath, {
+        rawToken: path.relative(skillDir, filePath),
+        displayPath: toDisplayPath(filePath, pathMappings),
+        path: filePath,
+        kind: "references-dir",
+      });
     }
   }
 
@@ -292,7 +486,7 @@ async function collectReferencedDocs({ raw, skillDir, skillPath }) {
       continue;
     }
 
-    const resolved = await resolvePathToken(normalized, skillDir, repoHints);
+    const resolved = await resolvePathToken(normalized, skillDir, logicalSkillDir, repoHints, pathMappings);
     const key = resolved.path || `unresolved:${normalized}`;
     if (!discovered.has(key)) {
       discovered.set(key, resolved);
@@ -302,8 +496,8 @@ async function collectReferencedDocs({ raw, skillDir, skillPath }) {
   const refs = [];
   for (const [key, info] of discovered.entries()) {
     const ref = await buildReferenceDoc({
-      idSeed: `${skillPath}:${key}`,
-      displayPath: info.rawToken,
+      idSeed: `${logicalSkillPath}:${key}`,
+      displayPath: info.displayPath || info.rawToken,
       pathToken: info.path,
       kind: info.kind,
     });
@@ -317,7 +511,7 @@ async function buildReferenceDoc({ idSeed, displayPath, pathToken, kind }) {
   const ref = {
     id: createHash("sha1").update(idSeed).digest("hex").slice(0, 12),
     label: displayPath,
-    path: pathToken ?? displayPath,
+    path: displayPath,
     exists: false,
     kind,
     title: inferDocTitle(displayPath),
@@ -461,10 +655,10 @@ function extractSections(raw) {
 
 function extractPathTokens(raw) {
   const tokens = new Set();
-  const absolute = [...raw.matchAll(/\/Users\/[^\s`"')\]]+/g)].map((match) => match[0]);
+  const absolute = [...raw.matchAll(/\/(?:Users|home)\/[^\s`"')\]]+/g)].map((match) => match[0]);
   const relative = [
     ...raw.matchAll(
-      /(?:^|[`"'(\s])((?:references|docs|scripts|assets|templates|examples)\/[^\s`"')\]]+)/gm,
+      /(?:^|[`"'(\s])((?:references|docs|scripts|assets|templates|examples|memory)\/[^\s`"')\]]+)/gm,
     ),
   ].map((match) => match[1]);
 
@@ -479,23 +673,46 @@ function sanitizeToken(token) {
   return token.replace(/[),.;]+$/g, "").trim();
 }
 
-async function resolvePathToken(token, skillDir, repoHints) {
-  if (token.startsWith("/Users/")) {
-    return { rawToken: token, path: token, kind: "absolute-path" };
+async function resolvePathToken(token, skillDir, logicalSkillDir, repoHints, pathMappings) {
+  if (path.isAbsolute(token)) {
+    return {
+      rawToken: token,
+      displayPath: token,
+      path: mapLogicalToRealPath(token, pathMappings) || token,
+      kind: "absolute-path",
+    };
   }
 
   if (token.startsWith("references/")) {
-    return { rawToken: token, path: path.join(skillDir, token), kind: "references-dir" };
+    return {
+      rawToken: token,
+      displayPath: path.join(logicalSkillDir, token),
+      path: path.join(skillDir, token),
+      kind: "references-dir",
+    };
   }
 
-  const candidates = [path.join(skillDir, token), ...repoHints.map((root) => path.join(root, token))];
-  for (const candidate of candidates) {
+  const logicalCandidates = [path.join(logicalSkillDir, token), ...repoHints.map((root) => path.join(root, token))];
+  const realCandidates = [path.join(skillDir, token), ...logicalCandidates.map((candidate) => mapLogicalToRealPath(candidate, pathMappings) || candidate)];
+
+  for (let index = 0; index < realCandidates.length; index += 1) {
+    const candidate = realCandidates[index];
     if (await fileExists(candidate)) {
-      return { rawToken: token, path: candidate, kind: "relative-doc" };
+      return {
+        rawToken: token,
+        displayPath: logicalCandidates[index] || token,
+        path: candidate,
+        kind: "relative-doc",
+      };
     }
   }
 
-  return { rawToken: token, path: candidates[0], kind: "relative-doc" };
+  return {
+    rawToken: token,
+    displayPath: logicalCandidates[0] || token,
+    path: realCandidates[0],
+    kind: "relative-doc",
+  };
 }
 
 function inferDocTitle(filePath) {
@@ -504,7 +721,9 @@ function inferDocTitle(filePath) {
 }
 
 function deriveRepoHints(raw) {
-  const absolutePaths = [...raw.matchAll(/\/Users\/[^\s`"')\]]+/g)].map((match) => sanitizeToken(match[0]));
+  const absolutePaths = [...raw.matchAll(/\/(?:Users|home)\/[^\s`"')\]]+/g)].map((match) =>
+    sanitizeToken(match[0]),
+  );
   const hints = [];
 
   for (const absolutePath of absolutePaths) {
@@ -512,13 +731,15 @@ function deriveRepoHints(raw) {
       continue;
     }
 
-    const phaseRoot = absolutePath.match(/^(\/Users\/[^/]+\/project\/[^/]+)\/\.phase\.json$/);
+    const phaseRoot = absolutePath.match(/^(\/(?:Users|home)\/[^/]+\/project\/[^/]+)\/\.phase\.json$/);
     if (phaseRoot) {
       hints.push(phaseRoot[1]);
       continue;
     }
 
-    const repoRoot = absolutePath.match(/^(\/Users\/[^/]+\/project\/[^/]+)\/(?:docs|scripts|backend|frontend|browser_web)\//);
+    const repoRoot = absolutePath.match(
+      /^(\/(?:Users|home)\/[^/]+\/project\/[^/]+)\/(?:docs|scripts|backend|frontend|browser_web)\//,
+    );
     if (repoRoot) {
       hints.push(repoRoot[1]);
     }
@@ -544,6 +765,18 @@ function inferCategory(name, source) {
       return "Plugin Canva";
     }
     return "Plugin Skills";
+  }
+
+  if (source.kind === "openclaw-builtin") {
+    return "OpenClaw Built-ins";
+  }
+
+  if (source.kind === "openclaw-workspace") {
+    return "OpenClaw Workspace";
+  }
+
+  if (source.kind === "openclaw-custom") {
+    return "OpenClaw Skills";
   }
 
   if (name.startsWith("social-listening-v3-")) {
@@ -629,8 +862,6 @@ function inferSummaryVi(name, description, heading, workflowHighlights) {
     .replace(/\buser asks to\b/gi, "người dùng yêu cầu")
     .replace(/\bthe user wants\b/gi, "người dùng muốn")
     .replace(/\bthe user\b/gi, "người dùng")
-    .replace(/\bworkflow\b/gi, "workflow")
-    .replace(/\bcomprehensive\b/gi, "toàn diện")
     .replace(/\bdebug\b/gi, "gỡ lỗi")
     .replace(/\breview\b/gi, "đánh giá")
     .replace(/\bbackend\b/gi, "backend")
@@ -638,14 +869,23 @@ function inferSummaryVi(name, description, heading, workflowHighlights) {
     .replace(/\brequirements\b/gi, "yêu cầu")
     .replace(/\buser\b/gi, "người dùng")
     .replace(/\btask\b/gi, "tác vụ")
-    .replace(/\bproduction\b/gi, "production")
     .replace(/\bplan\b/gi, "kế hoạch")
     .replace(/\bstrategy\b/gi, "chiến lược");
 
   return normalized.endsWith(".") ? normalized : `${normalized}.`;
 }
 
-function buildSearchText({ displayName, canonicalName, heading, description, workflowHighlights, guardrails, triggerPhrases, referencedDocs, raw }) {
+function buildSearchText({
+  displayName,
+  canonicalName,
+  heading,
+  description,
+  workflowHighlights,
+  guardrails,
+  triggerPhrases,
+  referencedDocs,
+  raw,
+}) {
   return normalizeForSearch(
     [
       displayName,
@@ -719,6 +959,38 @@ async function fileExists(target) {
   }
 }
 
+function toLogicalPath(realPath, source) {
+  if (!source.logicalRoot || source.logicalRoot === source.root) {
+    return realPath;
+  }
+
+  return path.join(source.logicalRoot, path.relative(source.root, realPath));
+}
+
+function toDisplayPath(realPath, pathMappings) {
+  return mapRealToLogicalPath(realPath, pathMappings) || realPath;
+}
+
+function mapLogicalToRealPath(logicalPath, pathMappings) {
+  for (const mapping of pathMappings) {
+    if (logicalPath === mapping.logicalRoot || logicalPath.startsWith(`${mapping.logicalRoot}/`)) {
+      return path.join(mapping.realRoot, path.relative(mapping.logicalRoot, logicalPath));
+    }
+  }
+
+  return null;
+}
+
+function mapRealToLogicalPath(realPath, pathMappings) {
+  for (const mapping of pathMappings) {
+    if (realPath === mapping.realRoot || realPath.startsWith(`${mapping.realRoot}/`)) {
+      return path.join(mapping.logicalRoot, path.relative(mapping.realRoot, realPath));
+    }
+  }
+
+  return null;
+}
+
 function unique(items) {
   return [...new Set(items.filter(Boolean))];
 }
@@ -729,6 +1001,36 @@ function capitalize(value) {
 
 function escapeRegExp(value) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+async function runCommand(command, args) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: repoRoot,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+
+    let stdout = "";
+    let stderr = "";
+
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk.toString();
+    });
+
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk.toString();
+    });
+
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve(stdout.trim());
+        return;
+      }
+
+      reject(new Error(`${command} ${args.join(" ")} failed with code ${code}: ${stderr || stdout}`));
+    });
+  });
 }
 
 main().catch((error) => {
