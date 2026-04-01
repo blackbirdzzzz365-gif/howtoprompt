@@ -11,46 +11,40 @@ type ExplainResponse = {
   example_prompts_vi: string[];
 };
 
-const storageKeys = {
-  apiKey: "skill-atlas:chiasegpu-key",
-  model: "skill-atlas:chiasegpu-model",
-};
-
 export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
+  const storageScope = `skill-explain:${skillSlug}`;
   const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState("gpt-4.1-mini");
+  const [resolvedModel, setResolvedModel] = useState("");
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<ExplainResponse | null>(null);
+  const [usedFallback, setUsedFallback] = useState(false);
+  const [providerError, setProviderError] = useState("");
 
   useEffect(() => {
-    const savedApiKey = window.localStorage.getItem(storageKeys.apiKey);
-    const savedModel = window.localStorage.getItem(storageKeys.model);
-    if (savedApiKey) {
-      setApiKey(savedApiKey);
+    const sectionApiKey = window.localStorage.getItem(getStorageKey(storageScope, "apiKey"));
+    const legacyApiKey = window.localStorage.getItem("skill-atlas:chiasegpu-key");
+    const sectionModel = window.localStorage.getItem(getStorageKey(storageScope, "model"));
+    if (sectionApiKey || legacyApiKey) {
+      setApiKey(sectionApiKey || legacyApiKey || "");
     }
-    if (savedModel) {
-      setModel(savedModel);
+    if (sectionModel) {
+      setResolvedModel(sectionModel);
     }
-  }, []);
+  }, [storageScope]);
 
   useEffect(() => {
     if (apiKey) {
-      window.localStorage.setItem(storageKeys.apiKey, apiKey);
+      window.localStorage.setItem(getStorageKey(storageScope, "apiKey"), apiKey);
     }
-  }, [apiKey]);
-
-  useEffect(() => {
-    if (model) {
-      window.localStorage.setItem(storageKeys.model, model);
-    }
-  }, [model]);
+  }, [apiKey, storageScope]);
 
   async function handleExplain(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setProviderError("");
 
     try {
       const response = await fetch(`/api/skill-atlas/${skillSlug}/explain`, {
@@ -60,19 +54,24 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
         },
         body: JSON.stringify({
           apiKey,
-          model,
           question,
         }),
       });
 
       const payload = await response.json();
       if (!response.ok) {
-        throw new Error(payload.error || "Khong goi duoc AI explainer.");
+        throw new Error(payload.error || "Không gọi được AI explainer.");
       }
 
       setResult(payload.response as ExplainResponse);
+      setResolvedModel(payload.model || "");
+      setUsedFallback(Boolean(payload.usedFallback));
+      setProviderError(payload.providerError || "");
+      if (payload.model) {
+        window.localStorage.setItem(getStorageKey(storageScope, "model"), payload.model);
+      }
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Khong goi duoc AI explainer.");
+      setError(submitError instanceof Error ? submitError.message : "Không gọi được AI explainer.");
       setResult(null);
     } finally {
       setLoading(false);
@@ -80,13 +79,14 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
   }
 
   return (
-    <section className="tool-card sticky-console">
+    <section className="tool-card">
       <p className="micro-label">AI Explain Mode</p>
       <h2 className="mission-title" style={{ marginTop: "8px" }}>
-        Hoi AI giai thich skill nay bang tieng Viet
+        Hỏi AI giải thích skill này bằng tiếng Việt
       </h2>
       <p className="mission-summary" style={{ marginTop: "10px" }}>
-        AI se doc raw `SKILL.md` va referral docs da sync vao DB roi moi giai thich.
+        AI sẽ đọc dữ liệu skill và referral docs đã sync vào DB rồi mới giải thích. API key được lưu riêng cho trang
+        skill này trong trình duyệt của bạn.
       </p>
 
       <form className="list-stack" style={{ marginTop: "16px" }} onSubmit={handleExplain}>
@@ -103,31 +103,24 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
         </label>
 
         <label className="field-group">
-          <span className="micro-label">Model</span>
-          <input
-            className="input-field"
-            type="text"
-            value={model}
-            onChange={(event) => setModel(event.target.value)}
-            placeholder="gpt-4.1-mini"
-          />
-        </label>
-
-        <label className="field-group">
-          <span className="micro-label">Cau hoi them</span>
+          <span className="micro-label">Câu hỏi thêm</span>
           <textarea
             className="textarea-field"
             rows={5}
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
-            placeholder="Vi du: giai thich cho toi nhu mot owner, skill nay thuc chat bat agent lam gi, skill con nao no hay goi va vi sao?"
+            placeholder="Ví dụ: giải thích cho tôi như một owner, skill này thực chất bắt agent làm gì, skill con nào nó hay gọi và vì sao?"
           />
         </label>
 
         <button className="button-primary" type="submit" disabled={loading}>
-          {loading ? "Dang giai thich..." : "Hoi AI ve skill nay"}
+          {loading ? "Đang giải thích..." : "Hỏi AI về skill này"}
         </button>
       </form>
+
+      <p className="muted-copy" style={{ marginTop: "12px" }}>
+        {resolvedModel ? `Model đang dùng gần nhất: ${resolvedModel}` : "Model sẽ được tự nhận diện sau lần gọi đầu tiên."}
+      </p>
 
       {error ? (
         <div className="empty-state" style={{ marginTop: "16px", borderStyle: "solid" }}>
@@ -137,8 +130,15 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
 
       {result ? (
         <div className="list-stack" style={{ marginTop: "18px" }}>
+          {usedFallback ? (
+            <div className="empty-state">
+              Đang hiển thị phần giải thích fallback cục bộ do AI provider chưa phản hồi ổn định.
+              {providerError ? ` Chi tiết: ${providerError}` : ""}
+            </div>
+          ) : null}
+
           <article className="detail-card">
-            <p className="micro-label">Tong quan</p>
+            <p className="micro-label">Tổng quan</p>
             <p className="mission-summary" style={{ marginTop: "10px" }}>
               {result.overview_vi}
             </p>
@@ -146,7 +146,7 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
 
           {result.when_to_use_vi?.length ? (
             <article className="detail-card">
-              <p className="micro-label">Khi nao nen dung</p>
+              <p className="micro-label">Khi nào nên dùng</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.when_to_use_vi.map((item) => (
                   <li key={item}>{item}</li>
@@ -179,7 +179,7 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
 
           {result.related_skills_vi ? (
             <article className="detail-card">
-              <p className="micro-label">Related skills</p>
+              <p className="micro-label">Skill liên quan</p>
               <p className="mission-summary" style={{ marginTop: "10px" }}>
                 {result.related_skills_vi}
               </p>
@@ -188,7 +188,7 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
 
           {result.example_prompts_vi?.length ? (
             <article className="detail-card">
-              <p className="micro-label">Prompt vi du</p>
+              <p className="micro-label">Prompt ví dụ</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.example_prompts_vi.map((item) => (
                   <li key={item}>{item}</li>
@@ -200,4 +200,8 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
       ) : null}
     </section>
   );
+}
+
+function getStorageKey(scope: string, field: string) {
+  return `skill-atlas:${scope}:${field}`;
 }

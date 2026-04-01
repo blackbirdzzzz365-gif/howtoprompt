@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAcademyProgress } from "@/components/app-provider";
-import { missions } from "@/lib/content";
 
 const navItems = [
   { href: "/", label: "Start" },
@@ -18,7 +17,7 @@ const navItems = [
 
 export function SiteHeader() {
   const pathname = usePathname();
-  const { completedMissionSlugs, reducedMotion, toggleReducedMotion, hydrated } = useAcademyProgress();
+  const { reducedMotion, toggleReducedMotion, hydrated } = useAcademyProgress();
 
   return (
     <header className="site-header">
@@ -43,11 +42,8 @@ export function SiteHeader() {
             </Link>
           ))}
           <button type="button" className="nav-link" onClick={toggleReducedMotion}>
-            {hydrated && reducedMotion ? "Motion: Off" : "Motion: On"}
+            {hydrated && reducedMotion ? "Chuyển động: Tắt" : "Chuyển động: Bật"}
           </button>
-          <div className="header-pulse">
-            {hydrated ? completedMissionSlugs.length : 0}/{missions.length} stages cleared
-          </div>
         </nav>
       </div>
     </header>

@@ -605,33 +605,42 @@ function inferCategory(name, source) {
 function inferSummaryVi(name, description, heading, workflowHighlights) {
   if (!description) {
     if (workflowHighlights.length > 0) {
-      return `Skill ${name} tap trung vao ${workflowHighlights[0].toLowerCase()}.`;
+      return `Skill ${name} tập trung vào: ${workflowHighlights[0].toLowerCase()}.`;
     }
-    return `Skill ${name} giup Codex giai quyet mot workflow chuyen biet.`;
+    return `Skill ${name} giúp Codex xử lý một workflow chuyên biệt.`;
   }
 
   let normalized = description.replace(/\s+/g, " ").trim();
   normalized = normalized
-    .replace(/^This skill should be used when\s+/i, "Dung khi ")
-    .replace(/^Use when the user asks to\s+/i, "Dung khi user yeu cau ")
-    .replace(/^Use when the user asks\s+/i, "Dung khi user yeu cau ")
-    .replace(/^Use when the task requires\s+/i, "Dung khi task can ")
-    .replace(/^Use when\s+/i, "Dung khi ")
-    .replace(/^Conducts\s+/i, "Skill nay thuc hien ")
-    .replace(/^Create and scaffold\s+/i, "Tao va scaffold ")
-    .replace(/^Create\s+/i, "Tao ")
-    .replace(/^Generate and maintain\s+/i, "Tao va duy tri ")
-    .replace(/^Generate\s+/i, "Tao ")
-    .replace(/^Build\s+/i, "Xay ")
-    .replace(/^Implement\s+/i, "Trien khai ")
-    .replace(/\bor wants\b/gi, "hoac khi ban muon")
-    .replace(/\buser asks to\b/gi, "user yeu cau")
-    .replace(/\bthe user wants\b/gi, "user muon")
-    .replace(/\bthe user\b/gi, "user")
+    .replace(/^This skill should be used when\s+/i, "Dùng khi ")
+    .replace(/^Use when the user asks to\s+/i, "Dùng khi người dùng yêu cầu ")
+    .replace(/^Use when the user asks\s+/i, "Dùng khi người dùng yêu cầu ")
+    .replace(/^Use when the task requires\s+/i, "Dùng khi tác vụ cần ")
+    .replace(/^Use when\s+/i, "Dùng khi ")
+    .replace(/^Conducts\s+/i, "Skill này thực hiện ")
+    .replace(/^Create and scaffold\s+/i, "Tạo và scaffold ")
+    .replace(/^Create\s+/i, "Tạo ")
+    .replace(/^Generate and maintain\s+/i, "Tạo và duy trì ")
+    .replace(/^Generate\s+/i, "Tạo ")
+    .replace(/^Build\s+/i, "Xây dựng ")
+    .replace(/^Implement\s+/i, "Triển khai ")
+    .replace(/^Master\s+/i, "Làm chủ ")
+    .replace(/\bor wants\b/gi, "hoặc khi bạn muốn")
+    .replace(/\buser asks to\b/gi, "người dùng yêu cầu")
+    .replace(/\bthe user wants\b/gi, "người dùng muốn")
+    .replace(/\bthe user\b/gi, "người dùng")
     .replace(/\bworkflow\b/gi, "workflow")
-    .replace(/\bcomprehensive\b/gi, "toan dien")
-    .replace(/\bdebug\b/gi, "debug")
-    .replace(/\breview\b/gi, "review");
+    .replace(/\bcomprehensive\b/gi, "toàn diện")
+    .replace(/\bdebug\b/gi, "gỡ lỗi")
+    .replace(/\breview\b/gi, "đánh giá")
+    .replace(/\bbackend\b/gi, "backend")
+    .replace(/\bdesign\b/gi, "thiết kế")
+    .replace(/\brequirements\b/gi, "yêu cầu")
+    .replace(/\buser\b/gi, "người dùng")
+    .replace(/\btask\b/gi, "tác vụ")
+    .replace(/\bproduction\b/gi, "production")
+    .replace(/\bplan\b/gi, "kế hoạch")
+    .replace(/\bstrategy\b/gi, "chiến lược");
 
   return normalized.endsWith(".") ? normalized : `${normalized}.`;
 }
