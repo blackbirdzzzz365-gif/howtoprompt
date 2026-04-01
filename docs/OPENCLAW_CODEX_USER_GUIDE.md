@@ -431,6 +431,25 @@ Trang này mô phỏng riêng:
 - lúc nào phải dừng ở Gate 1 hay Gate 2
 - `linux_main`, `lavis_linux`, `gaubot` khác nhau ra sao trong vòng phát triển `social-listening-v3`
 
+Neu muon hoc tung skill theo kiểu tra cứu:
+
+- `/social-listening-arena/skills`
+
+Trang nay co them:
+
+- danh sach toan bo skill da sync vao app
+- trang detail cua tung skill
+- related skills neu raw docs co nhac toi nhau
+- raw `SKILL.md` va raw referral docs co the mo rieng
+- AI advisor: nhap mong muon, AI goi y nen dung skill nao
+- AI explain mode: mo 1 skill va yeu cau AI giai thich bang tieng Viet
+
+Model sync hien tai:
+
+- skill catalog duoc snapshot thanh `data/skill-atlas.generated.json`
+- production site doc tu snapshot nay, khong doc truc tiep filesystem local
+- khi skill tren may cua ban doi, yeu cau Codex rerun `pnpm sync:skills`, review diff, roi deploy lai site
+
 ## 11. Những lỗi bạn rất dễ lặp lại
 
 ### Lỗi 1: Trộn nhiều gate

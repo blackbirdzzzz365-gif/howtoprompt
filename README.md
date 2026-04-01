@@ -33,6 +33,7 @@ pnpm dev
 pnpm build
 pnpm lint
 pnpm typecheck
+pnpm sync:skills
 ```
 
 ## Main routes
@@ -41,6 +42,9 @@ pnpm typecheck
 - `/missions`
 - `/missions/[slug]`
 - `/prompt-lab`
+- `/social-listening-arena`
+- `/social-listening-arena/skills`
+- `/social-listening-arena/skills/[slug]`
 - `/simulator`
 - `/quick-ref`
 - `/ops`
@@ -48,5 +52,7 @@ pnpm typecheck
 ## Notes
 
 - Progress duoc luu local trong browser va sync them vao `.data/runtime-store.json` qua API.
+- Skill Atlas duoc sync tu local Codex skills thanh `data/skill-atlas.generated.json` bang `pnpm sync:skills`.
+- AI advisor/explainer goi `https://llm.chiasegpu.vn/v1/chat/completions`; API key duoc user nhap truc tiep tren web.
 - MVP phase 1 uu tien deterministic evaluation thay vi LLM critique.
 - Reduced motion toggle nam tren header.

@@ -154,6 +154,9 @@ export default function HomePage() {
           <Link href="/social-listening-arena" className="button-primary">
             Enter social listening arena
           </Link>
+          <Link href="/social-listening-arena/skills" className="button-secondary">
+            Open skill atlas
+          </Link>
         </div>
       </section>
 

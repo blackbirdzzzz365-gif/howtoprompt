@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "sync:skills": "node scripts/sync_skill_atlas.mjs"
   },
   "dependencies": {
     "next": "16.2.1",

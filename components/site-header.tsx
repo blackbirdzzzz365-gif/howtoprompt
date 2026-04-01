@@ -9,6 +9,7 @@ const navItems = [
   { href: "/", label: "Start" },
   { href: "/missions", label: "Missions" },
   { href: "/social-listening-arena", label: "SL Arena" },
+  { href: "/social-listening-arena/skills", label: "Skill Atlas" },
   { href: "/prompt-lab", label: "Prompt Lab" },
   { href: "/simulator", label: "Simulator" },
   { href: "/quick-ref", label: "Quick Ref" },
