@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { getSkillAtlasCatalog, type SkillAtlasCatalogId } from "@/lib/skill-atlas-catalogs";
 
 type ExplainResponse = {
   overview_vi: string;
@@ -11,8 +12,17 @@ type ExplainResponse = {
   example_prompts_vi: string[];
 };
 
-export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
-  const storageScope = `skill-explain:${skillSlug}`;
+export function SkillExplainPanel({
+  catalogId,
+  apiBasePath,
+  skillSlug,
+}: {
+  catalogId: SkillAtlasCatalogId;
+  apiBasePath: string;
+  skillSlug: string;
+}) {
+  const storageScope = `skill-explain:${catalogId}:${skillSlug}`;
+  const catalog = getSkillAtlasCatalog(catalogId);
   const [apiKey, setApiKey] = useState("");
   const [resolvedModel, setResolvedModel] = useState("");
   const [question, setQuestion] = useState("");
@@ -47,7 +57,7 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
     setProviderError("");
 
     try {
-      const response = await fetch(`/api/skill-atlas/${skillSlug}/explain`, {
+      const response = await fetch(`${apiBasePath}/${skillSlug}/explain`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -86,7 +96,7 @@ export function SkillExplainPanel({ skillSlug }: { skillSlug: string }) {
       </h2>
       <p className="mission-summary" style={{ marginTop: "10px" }}>
         AI sẽ đọc dữ liệu skill và referral docs đã sync vào DB rồi mới giải thích. API key được lưu riêng cho trang
-        skill này trong trình duyệt của bạn.
+        skill này trong trình duyệt của bạn. Catalog đang xem là {catalog?.shortTitle ?? catalogId}.
       </p>
 
       <form className="list-stack" style={{ marginTop: "16px" }} onSubmit={handleExplain}>

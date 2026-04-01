@@ -647,14 +647,20 @@ export function SocialListeningArena() {
 
       <section className="panel section-block">
         <p className="eyebrow">Skill Atlas</p>
-        <h2 className="section-title">Muon hoc tung skill cua Codex theo cach co the tra cuu va hoi AI</h2>
+        <h2 className="section-title">Muốn tra cứu skill của host, Codex linuxvm và OpenClaw linuxvm ở một chỗ</h2>
         <p className="section-copy">
-          Ngoai quest board, arena nay da co them mot kho skill rieng. Ban co the xem toan bo skill, related
-          skills, referral docs, raw `SKILL.md`, va hoi AI nen dung skill nao cho tinh huong cu the.
+          Ngoài quest board, arena này còn có ba kho skill riêng. Bạn có thể tra cứu skill trên host, bundle Codex
+          trên `linuxvm`, và bundle OpenClaw trên `linuxvm`, rồi hỏi AI nên dùng skill nào cho đúng tình huống.
         </p>
         <div className="hero-actions">
           <Link href="/social-listening-arena/skills" className="button-primary">
-            Open Skill Atlas
+            Codex host
+          </Link>
+          <Link href="/social-listening-arena/skills-vm-codex" className="button-secondary">
+            Codex linuxvm
+          </Link>
+          <Link href="/social-listening-arena/skills-vm-openclaw" className="button-secondary">
+            OpenClaw linuxvm
           </Link>
         </div>
       </section>

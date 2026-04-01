@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useDeferredValue, useState } from "react";
 import { SkillAdvisorPanel } from "@/components/skill-advisor-panel";
+import { type SkillAtlasCatalog } from "@/lib/skill-atlas-catalogs";
+import { formatRawBytes, localizeCategory, localizeSourceLabel } from "@/lib/skill-atlas-ui";
 
 type SkillListItem = {
   slug: string;
@@ -24,6 +26,8 @@ type SkillListItem = {
 };
 
 type SkillAtlasDirectoryProps = {
+  catalog: SkillAtlasCatalog;
+  catalogLinks: SkillAtlasCatalog[];
   generatedAt: string;
   skillCount: number;
   referenceCount: number;
@@ -31,46 +35,9 @@ type SkillAtlasDirectoryProps = {
   skills: SkillListItem[];
 };
 
-function formatRawBytes(bytes: number) {
-  if (bytes < 1024) {
-    return `${bytes} B`;
-  }
-  if (bytes < 1024 * 1024) {
-    return `${(bytes / 1024).toFixed(1)} KB`;
-  }
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function localizeCategory(category: string) {
-  const categoryMap: Record<string, string> = {
-    "Architecture / Engineering": "Kiến trúc / Kỹ thuật",
-    "Blackbird Platform": "Nền tảng Blackbird",
-    "Codex System": "Hệ thống Codex",
-    "General Engineering": "Kỹ thuật tổng quát",
-    "OpenClaw / VM": "OpenClaw / VM",
-    "Plugin GitHub": "Plugin GitHub",
-    "Plugin Canva": "Plugin Canva",
-    "Plugin Skills": "Plugin",
-    "Product / Analysis": "Sản phẩm / Phân tích",
-    "Social Listening v3": "Social Listening v3",
-  };
-
-  return categoryMap[category] || category;
-}
-
-function localizeSourceLabel(sourceLabel: string) {
-  const sourceLabelMap: Record<string, string> = {
-    "Installed Codex Skills": "Installed Codex Skills",
-    "Global Team Skills": "Bộ skill dùng chung của team",
-    "Blackbird Repo Skills": "Skill trong repo Blackbird",
-    "Canva Plugin Skills": "Skill từ plugin Canva",
-    "Github Plugin Skills": "Skill từ plugin GitHub",
-  };
-
-  return sourceLabelMap[sourceLabel] || sourceLabel;
-}
-
 export function SkillAtlasDirectory({
+  catalog,
+  catalogLinks,
   generatedAt,
   skillCount,
   referenceCount,
@@ -108,12 +75,28 @@ export function SkillAtlasDirectory({
   return (
     <div className="detail-grid">
       <section className="panel section-block panel-strong">
-        <p className="eyebrow">SL Arena / Skill Atlas</p>
-        <h1 className="section-title">Kho skill Codex và referral docs đã được sync vào app</h1>
+        <p className="eyebrow">{catalog.eyebrow}</p>
+        <h1 className="section-title">{catalog.title}</h1>
         <p className="section-copy">
-          Đây là catalog đã được snapshot từ máy của bạn. Mỗi skill có tên, công dụng, trigger phrases,
-          workflow, related skills, raw `SKILL.md`, và referral docs để bạn đọc lại hoặc hỏi AI.
+          {catalog.description} Mỗi skill có tên, công dụng, trigger phrases, workflow, related skills, raw
+          `SKILL.md`, và referral docs để bạn đọc lại hoặc hỏi AI.
         </p>
+
+        <div className="detail-card" style={{ marginTop: "22px" }}>
+          <p className="micro-label">Chuyển catalog</p>
+          <div className="chip-row" style={{ marginTop: "12px" }}>
+            {catalogLinks.map((item) => (
+              <Link
+                key={item.id}
+                href={item.pagePath}
+                className="nav-link"
+                data-active={item.id === catalog.id}
+              >
+                {item.shortTitle}
+              </Link>
+            ))}
+          </div>
+        </div>
 
         <div className="stats-grid" style={{ marginTop: "22px" }}>
           <div className="stat-card">
@@ -135,9 +118,8 @@ export function SkillAtlasDirectory({
         <div className="detail-card" style={{ marginTop: "22px" }}>
           <p className="micro-label">Mô hình sync</p>
           <p className="mission-summary" style={{ marginTop: "8px" }}>
-            Production site không đọc trực tiếp filesystem skill trên máy Mac của bạn. Vì vậy atlas này được sync
-            thành JSON DB rồi mới deploy. Khi skill đổi, bạn chỉ cần yêu cầu Codex chạy lại `pnpm sync:skills`,
-            review diff, rồi deploy lại site.
+            Production site không đọc trực tiếp filesystem skill gốc. Vì vậy atlas này được sync thành JSON DB rồi
+            mới deploy. {catalog.syncHint}
           </p>
         </div>
 
@@ -215,7 +197,7 @@ export function SkillAtlasDirectory({
                 <span className="muted-copy">
                   {skill.referencedDocCount} refs • {skill.relatedSkillNames.length} related • {formatRawBytes(skill.rawBytes)}
                 </span>
-                <Link href={`/social-listening-arena/skills/${skill.slug}`} className="button-secondary">
+                <Link href={`${catalog.pagePath}/${skill.slug}`} className="button-secondary">
                   Mở chi tiết
                 </Link>
               </div>
@@ -231,7 +213,11 @@ export function SkillAtlasDirectory({
       </section>
 
       <aside className="tool-stack">
-        <SkillAdvisorPanel />
+        <SkillAdvisorPanel
+          catalogId={catalog.id}
+          apiBasePath={catalog.apiPath}
+          detailBasePath={catalog.pagePath}
+        />
 
         <section className="tool-card">
           <p className="micro-label">Cách học nhanh</p>
