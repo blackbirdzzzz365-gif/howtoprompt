@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useAcademyProgress } from "@/components/app-provider";
-import { getPath } from "@/lib/content";
 import type { Mission } from "@/lib/content-schema";
 
 export function MissionMap({
@@ -13,7 +12,6 @@ export function MissionMap({
   compact?: boolean;
 }) {
   const { completedMissionSlugs, activePathSlug, hydrated } = useAcademyProgress();
-  const activePath = activePathSlug ? getPath(activePathSlug) : null;
 
   return (
     <div className="mission-grid" data-compact={compact}>
@@ -23,9 +21,10 @@ export function MissionMap({
         return (
           <article key={mission.slug} className="mission-card" data-complete={complete}>
             <div className="chip-row">
-              <span className="chip">Nhiệm vụ {String(mission.order).padStart(2, "0")}</span>
+              <span className="chip">Stage {String(mission.order).padStart(2, "0")}</span>
               <span className="outline-chip">{mission.duration}</span>
-              {complete ? <span className="status-chip">Đã nắm</span> : null}
+              <span className="outline-chip">{mission.focus}</span>
+              {complete ? <span className="status-chip">Cleared</span> : null}
             </div>
             <h3 className="mission-title" style={{ marginTop: "14px" }}>
               {mission.title}
@@ -34,25 +33,25 @@ export function MissionMap({
               {mission.tagline}
             </p>
             <p className="muted-copy" style={{ marginTop: "12px" }}>
-              Bạn sẽ làm được: {mission.outcome}
+              Outcome: {mission.outcome}
             </p>
             <div className="detail-actions" style={{ marginTop: "18px" }}>
               <Link href={`/missions/${mission.slug}`} className="button-secondary">
-                Xem chi tiết
+                Enter mission
               </Link>
               {mission.practiceMode === "prompt-lab" ? (
                 <Link href="/prompt-lab" className="button-ghost">
-                  Thực hành
+                  Practice gate
                 </Link>
               ) : (
                 <Link href={`/simulator?scenario=${mission.slug}`} className="button-ghost">
-                  Mô phỏng
+                  Run sim
                 </Link>
               )}
             </div>
-            {hydrated && activePath ? (
+            {hydrated && activePathSlug ? (
               <p className="micro-label" style={{ marginTop: "14px" }}>
-                Lộ trình đang chọn: {activePath.title}
+                Active path: {activePathSlug}
               </p>
             ) : null}
           </article>

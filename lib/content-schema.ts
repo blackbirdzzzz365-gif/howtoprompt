@@ -6,6 +6,11 @@ export const lessonBlockSchema = z.object({
   bullets: z.array(z.string()).default([]),
 });
 
+export const promptExampleSchema = z.object({
+  label: z.string(),
+  prompt: z.string(),
+});
+
 export const quickRefSchema = z.object({
   id: z.string(),
   title: z.string(),
@@ -32,7 +37,11 @@ export const missionSchema = z.object({
   focus: z.string(),
   quickRefId: z.string(),
   practiceMode: z.enum(["prompt-lab", "simulator", "mixed"]),
+  useWhen: z.string(),
+  winCondition: z.string(),
+  failureModes: z.array(z.string()),
   lessonBlocks: z.array(lessonBlockSchema),
+  examplePrompts: z.array(promptExampleSchema).default([]),
   evidenceBullets: z.array(z.string()),
 });
 
@@ -75,3 +84,4 @@ export type QuickRef = z.infer<typeof quickRefSchema>;
 export type Scenario = z.infer<typeof scenarioSchema>;
 export type ScenarioStep = z.infer<typeof scenarioStepSchema>;
 export type ScenarioChoice = z.infer<typeof scenarioChoiceSchema>;
+export type PromptExample = z.infer<typeof promptExampleSchema>;

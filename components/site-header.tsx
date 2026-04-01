@@ -3,14 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAcademyProgress } from "@/components/app-provider";
+import { missions } from "@/lib/content";
 
 const navItems = [
-  { href: "/", label: "Trang chủ" },
-  { href: "/missions", label: "Lộ trình" },
+  { href: "/", label: "Start" },
+  { href: "/missions", label: "Missions" },
+  { href: "/social-listening-arena", label: "SL Arena" },
   { href: "/prompt-lab", label: "Prompt Lab" },
-  { href: "/simulator", label: "Mô phỏng" },
-  { href: "/quick-ref", label: "Thẻ nhắc" },
-  { href: "/ops", label: "Vận hành" },
+  { href: "/simulator", label: "Simulator" },
+  { href: "/quick-ref", label: "Quick Ref" },
+  { href: "/ops", label: "Ops" },
 ];
 
 export function SiteHeader() {
@@ -24,7 +26,7 @@ export function SiteHeader() {
           <div className="brand-badge">OC</div>
           <div className="brand-text">
             <span className="eyebrow">OpenClaw x Codex</span>
-            <span className="brand-title">Học viện Mission Control</span>
+            <span className="brand-title">Operator Campaign</span>
           </div>
         </Link>
 
@@ -40,9 +42,11 @@ export function SiteHeader() {
             </Link>
           ))}
           <button type="button" className="nav-link" onClick={toggleReducedMotion}>
-            {hydrated && reducedMotion ? "Hiệu ứng: Giảm" : "Hiệu ứng: Đầy đủ"}
+            {hydrated && reducedMotion ? "Motion: Off" : "Motion: On"}
           </button>
-          <div className="header-pulse">{hydrated ? completedMissionSlugs.length : 0}/6 nhiệm vụ đã xong</div>
+          <div className="header-pulse">
+            {hydrated ? completedMissionSlugs.length : 0}/{missions.length} stages cleared
+          </div>
         </nav>
       </div>
     </header>

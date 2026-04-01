@@ -4,11 +4,11 @@ import { missions } from "@/lib/content";
 export default function MissionsPage() {
   return (
     <section className="panel section-block panel-strong">
-      <p className="eyebrow">Lộ trình nhiệm vụ</p>
-      <h1 className="section-title">6 nhiệm vụ bám sát guide gốc</h1>
+      <p className="eyebrow">Mission map</p>
+      <h1 className="section-title">Six stages tied directly to the real product loop</h1>
       <p className="section-copy">
-        Đây là phiên bản cô đọng từ 15 section trong guide gốc, được sắp lại thành 6 nhiệm vụ để bạn học, thực
-        hành và mở khóa các thẻ nhắc quan trọng.
+        Day la phien ban website cua operator playbook goc, duoc dong lai thanh 6 stage co the hoc, practice,
+        unlock quick refs va di theo dung 2 human gate cua workflow.
       </p>
       <MissionMap missions={missions} />
     </section>

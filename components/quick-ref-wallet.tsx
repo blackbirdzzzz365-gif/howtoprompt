@@ -1,7 +1,6 @@
 "use client";
 
 import { useAcademyProgress } from "@/components/app-provider";
-import { getMission } from "@/lib/content";
 import type { QuickRef } from "@/lib/content-schema";
 
 export function QuickRefWallet({ items }: { items: QuickRef[] }) {
@@ -11,15 +10,12 @@ export function QuickRefWallet({ items }: { items: QuickRef[] }) {
     <div className="quick-ref-grid">
       {items.map((item) => {
         const unlocked = hydrated && quickRefIds.includes(item.id);
-        const unlockMission = getMission(item.unlocksFromMission);
 
         return (
           <article key={item.id} className="quick-ref-card" data-locked={!unlocked}>
             <div className="chip-row">
-              <span className="chip">{unlocked ? "Đã mở khóa" : "Chưa mở"}</span>
-              <span className="outline-chip">
-                {unlockMission ? `Nhiệm vụ ${String(unlockMission.order).padStart(2, "0")}` : item.unlocksFromMission}
-              </span>
+              <span className="chip">{unlocked ? "Unlocked" : "Locked"}</span>
+              <span className="outline-chip">{item.unlocksFromMission}</span>
             </div>
             <h2 className="mission-title" style={{ marginTop: "14px" }}>
               {item.title}
@@ -34,12 +30,12 @@ export function QuickRefWallet({ items }: { items: QuickRef[] }) {
             </ul>
             {!unlocked ? (
               <p className="muted-copy" style={{ marginTop: "12px" }}>
-                Hoàn thành <strong>{unlockMission?.title ?? item.unlocksFromMission}</strong> để mở thẻ này.
+                Complete stage <strong>{item.unlocksFromMission}</strong> de mo khoa card nay.
               </p>
             ) : null}
             {hydrated && completedMissionSlugs.includes(item.unlocksFromMission) ? (
               <p className="status-message" style={{ marginTop: "12px" }}>
-                Bạn có thể dùng ngay khi viết prompt thật.
+                San sang de copy vao prompt that.
               </p>
             ) : null}
           </article>

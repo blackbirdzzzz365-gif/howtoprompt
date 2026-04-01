@@ -361,32 +361,50 @@ textarea {
   color: var(--ink-700);
 }
 
-.orbit-node[data-slot="section"] {
-  top: 28%;
-  left: 14%;
+.orbit-node[data-slot="owner"] {
+  top: 16%;
+  left: 12%;
 }
 
-.orbit-node[data-slot="ticket"] {
-  top: 12%;
-  right: 20%;
+.orbit-node[data-slot="bot"] {
+  top: 10%;
+  right: 24%;
 }
 
-.orbit-node[data-slot="context"] {
+.orbit-node[data-slot="codex"] {
+  top: 40%;
+  right: 6%;
+}
+
+.orbit-node[data-slot="repo"] {
   bottom: 18%;
-  left: 18%;
+  right: 18%;
 }
 
-.orbit-node[data-slot="loop"] {
-  bottom: 14%;
-  right: 10%;
+.orbit-node[data-slot="gate"] {
+  bottom: 10%;
+  left: 20%;
+}
+
+.orbit-node[data-slot="prod"] {
+  top: 42%;
+  left: 8%;
 }
 
 .stats-grid,
+.loop-grid,
+.arena-intro-grid,
 .path-grid,
 .mission-grid,
 .detail-grid,
 .quick-ref-grid,
-.ops-grid {
+.ops-grid,
+.runtime-grid,
+.command-grid,
+.arena-turn-grid,
+.arena-support-grid,
+.arena-meta-grid,
+.role-grid {
   display: grid;
   gap: 16px;
 }
@@ -531,6 +549,15 @@ textarea {
   gap: 14px;
 }
 
+.arena-intro-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.loop-grid {
+  margin-top: 20px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .signal-dot {
   width: 10px;
   height: 10px;
@@ -542,6 +569,35 @@ textarea {
 .detail-grid {
   grid-template-columns: 1.25fr 0.9fr;
   align-items: start;
+}
+
+.arena-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  margin-top: 24px;
+}
+
+.detail-grid-tight {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.arena-meta-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.arena-turn-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.arena-support-grid {
+  grid-template-columns: 1.05fr 0.95fr;
+}
+
+.role-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 18px;
 }
 
 .detail-card ul,
@@ -561,6 +617,83 @@ textarea {
   font-family: "Space Grotesk", var(--font-sans);
   font-size: 1.05rem;
   font-weight: 700;
+}
+
+.prompt-card {
+  border: 1px solid rgba(39, 65, 95, 0.12);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 16px;
+}
+
+.quest-card,
+.role-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.76);
+  padding: 16px;
+  text-align: left;
+}
+
+.quest-card {
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease;
+}
+
+.quest-card:hover,
+.quest-card[data-active="true"] {
+  transform: translateY(-2px);
+  border-color: rgba(24, 183, 176, 0.34);
+  box-shadow: 0 18px 32px rgba(19, 34, 56, 0.12);
+}
+
+.quest-card[data-active="true"],
+.role-card[data-active="true"] {
+  background:
+    radial-gradient(circle at top right, rgba(24, 183, 176, 0.14), transparent 38%),
+    rgba(255, 255, 255, 0.84);
+}
+
+.role-card[data-active="true"] {
+  border-color: rgba(59, 127, 99, 0.28);
+}
+
+.quest-rail {
+  display: grid;
+  gap: 14px;
+  position: sticky;
+  top: 110px;
+}
+
+.skill-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 7px 11px;
+  background: rgba(19, 34, 56, 0.08);
+  color: var(--ink-900);
+  font-size: 0.84rem;
+  font-family: "IBM Plex Mono", var(--font-mono);
+}
+
+.example-prompt {
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(39, 65, 95, 0.12);
+  background:
+    linear-gradient(180deg, rgba(19, 34, 56, 0.92), rgba(39, 65, 95, 0.94)),
+    linear-gradient(135deg, rgba(24, 183, 176, 0.16), transparent 40%);
+  color: #f4f7fb;
+  padding: 14px 16px;
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: 0.92rem;
+  line-height: 1.7;
 }
 
 .form-grid {
@@ -701,6 +834,14 @@ textarea {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.runtime-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.command-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .quick-ref-card[data-locked="true"] {
   opacity: 0.62;
   filter: saturate(0.55);
@@ -819,11 +960,21 @@ textarea {
 
 @media (max-width: 980px) {
   .hero-grid,
+  .loop-grid,
+  .arena-intro-grid,
   .detail-grid,
+  .arena-layout,
+  .detail-grid-tight,
   .mission-grid,
   .path-grid,
   .quick-ref-grid,
-  .ops-grid {
+  .ops-grid,
+  .runtime-grid,
+  .command-grid,
+  .arena-turn-grid,
+  .arena-support-grid,
+  .arena-meta-grid,
+  .role-grid {
     grid-template-columns: 1fr;
   }
 
@@ -845,6 +996,10 @@ textarea {
   }
 
   .sticky-console {
+    position: static;
+  }
+
+  .quest-rail {
     position: static;
   }
 }

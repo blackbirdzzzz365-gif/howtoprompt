@@ -20,11 +20,11 @@ type SimulatorResponse = {
 };
 
 const missionToScenario: Record<string, string> = {
-  "continue-or-new-issue": "scenario-issue-boundary",
-  "choose-right-bot": "scenario-bot-fit",
-  "hidden-system": "scenario-hidden-system",
-  "blockers-and-auth": "scenario-blocker-auth",
-  "one-section-one-issue": "scenario-issue-boundary",
+  "read-the-board": "scenario-runtime-choice",
+  "one-gate-one-prompt": "scenario-gate-discipline",
+  "production-raid": "scenario-production-verdict",
+  "direction-lock": "scenario-contained-fix",
+  "merge-or-replay": "scenario-merge-gate",
 };
 
 export function SimulatorPanel() {
@@ -33,7 +33,7 @@ export function SimulatorPanel() {
   const derivedScenario = missionToScenario[initialScenarioId ?? ""] ?? initialScenarioId ?? scenarios[0]?.id;
   const [scenarioId, setScenarioId] = useState(derivedScenario);
   const [response, setResponse] = useState<SimulatorResponse | null>(null);
-  const [status, setStatus] = useState("Chọn một tình huống rồi đưa ra quyết định của bạn.");
+  const [status, setStatus] = useState("Chon scenario roi thuc hien mot quyet dinh.");
   const { completeMission, recordEvent, reducedMotion } = useAcademyProgress();
 
   const scenario = useMemo(() => scenarios.find((item) => item.id === scenarioId) ?? scenarios[0], [scenarioId]);
@@ -67,15 +67,15 @@ export function SimulatorPanel() {
   return (
     <div className="detail-grid">
       <section className="panel section-block panel-strong">
-        <p className="eyebrow">Mô phỏng hệ thống</p>
-        <h1 className="section-title">Quan sát hệ thống phản hồi theo từng lựa chọn của bạn</h1>
+        <p className="eyebrow">System Simulator</p>
+        <h1 className="section-title">Xem game board phan ung theo lua chon cua ban</h1>
         <p className="section-copy">
-          Phần mô phỏng này giúp bạn luyện 4 nhóm tình huống dễ gặp nhất: ranh giới issue, chọn bot, hidden
-          system loop và blocker do auth hoặc rate limit.
+          Simulator nay day 6 quyet dinh can nhat: chon dung control surface, giu gate discipline, doc verdict,
+          khoa huong, giu merge gate, va recover auth tren linuxvm.
         </p>
 
         <div className="field" style={{ marginTop: "20px" }}>
-          <label htmlFor="scenario-picker">Tình huống</label>
+          <label htmlFor="scenario-picker">Scenario</label>
           <select
             id="scenario-picker"
             className="select"
@@ -83,7 +83,7 @@ export function SimulatorPanel() {
             onChange={(event) => {
               setScenarioId(event.target.value);
               setResponse(null);
-              setStatus("Đã chuyển tình huống. Hãy chọn một phương án để xem hệ thống phản hồi ra sao.");
+              setStatus("Scenario da doi. Chon mot phuong an de xem timeline.");
             }}
           >
             {scenarios.map((item) => (
@@ -95,7 +95,7 @@ export function SimulatorPanel() {
         </div>
 
         <div className="detail-card" style={{ marginTop: "18px" }}>
-          <p className="micro-label">Gắn với nhiệm vụ</p>
+          <p className="micro-label">Stage anchor</p>
           <h2 className="mission-title" style={{ marginTop: "6px" }}>
             {mission?.title}
           </h2>
@@ -105,7 +105,7 @@ export function SimulatorPanel() {
         </div>
 
         <div className="detail-card" style={{ marginTop: "16px" }}>
-          <p className="micro-label">Tình huống đưa ra</p>
+          <p className="micro-label">Prompt</p>
           <h3 className="mission-title" style={{ marginTop: "8px" }}>
             {step.prompt}
           </h3>
@@ -128,9 +128,9 @@ export function SimulatorPanel() {
 
       <aside className="tool-stack sticky-console">
         <section className="tool-card">
-          <p className="micro-label">Chế độ hiển thị</p>
+          <p className="micro-label">Simulator mode</p>
           <p className="muted-copy" style={{ marginTop: "8px" }}>
-            Giảm chuyển động: {reducedMotion ? "đang bật" : "đang tắt"}.
+            Reduced motion: {reducedMotion ? "on" : "off"}.
           </p>
         </section>
 
@@ -138,7 +138,7 @@ export function SimulatorPanel() {
           <>
             <section className="tool-card">
               <div className="score-band" data-band={response.isCorrect ? "Good" : "Needs work"}>
-                <strong>{response.isCorrect ? "Lựa chọn hợp lý" : "Có rủi ro cần lưu ý"}</strong>
+                <strong>{response.isCorrect ? "Correct path" : "Risk detected"}</strong>
               </div>
               <p className="muted-copy" style={{ marginTop: "12px" }}>
                 {response.explanation}
@@ -146,7 +146,7 @@ export function SimulatorPanel() {
             </section>
 
             <section className="tool-card">
-              <p className="micro-label">Trạng thái hệ thống</p>
+              <p className="micro-label">Timeline state</p>
               <div className="timeline-grid" style={{ marginTop: "14px" }}>
                 {response.timelineState.map((item) => (
                   <div key={`${item.title}-${item.state}`} className="timeline-card" data-tone={item.tone}>
@@ -162,9 +162,9 @@ export function SimulatorPanel() {
           </>
         ) : (
           <section className="tool-card">
-            <p className="micro-label">Trạng thái hệ thống</p>
+            <p className="micro-label">Timeline state</p>
             <div className="empty-state" style={{ marginTop: "14px" }}>
-              Timeline sẽ hiện ra sau khi bạn chọn một phương án.
+              Timeline se xuat hien sau khi ban chon mot phuong an.
             </div>
           </section>
         )}
