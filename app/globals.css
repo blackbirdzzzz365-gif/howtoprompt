@@ -706,6 +706,11 @@ textarea {
   gap: 8px;
 }
 
+.field-group {
+  display: grid;
+  gap: 8px;
+}
+
 .field label {
   font-size: 0.95rem;
   font-weight: 600;
@@ -725,16 +730,71 @@ textarea {
     box-shadow 150ms ease;
 }
 
+.input-field,
+.textarea-field {
+  width: 100%;
+  border-radius: 18px;
+  border: 1px solid rgba(39, 65, 95, 0.14);
+  background: rgba(255, 255, 255, 0.88);
+  padding: 14px 16px;
+  outline: none;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
 .textarea {
   min-height: 208px;
   resize: vertical;
 }
 
+.textarea-field {
+  min-height: 160px;
+  resize: vertical;
+}
+
 .input:focus,
 .select:focus,
-.textarea:focus {
+.textarea:focus,
+.input-field:focus,
+.textarea-field:focus {
   border-color: rgba(24, 183, 176, 0.64);
   box-shadow: 0 0 0 4px rgba(24, 183, 176, 0.12);
+}
+
+.atlas-toolbar,
+.outline-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.atlas-search {
+  flex: 1 1 280px;
+}
+
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.skill-card,
+.reference-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.76);
+  padding: 18px;
+}
+
+.mono-path {
+  font-family: "IBM Plex Mono", var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--ink-700);
+  word-break: break-word;
 }
 
 .score-band {
@@ -964,6 +1024,7 @@ textarea {
   .arena-intro-grid,
   .detail-grid,
   .arena-layout,
+  .skill-grid,
   .detail-grid-tight,
   .mission-grid,
   .path-grid,
@@ -981,6 +1042,11 @@ textarea {
   .stats-grid,
   .signal-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .atlas-toolbar,
+  .outline-row {
+    align-items: stretch;
   }
 
   .site-header-inner,
@@ -1015,7 +1081,8 @@ textarea {
   }
 
   .stats-grid,
-  .signal-grid {
+  .signal-grid,
+  .skill-grid {
     grid-template-columns: 1fr;
   }
 

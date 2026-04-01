@@ -646,6 +646,20 @@ export function SocialListeningArena() {
       </section>
 
       <section className="panel section-block">
+        <p className="eyebrow">Skill Atlas</p>
+        <h2 className="section-title">Muon hoc tung skill cua Codex theo cach co the tra cuu va hoi AI</h2>
+        <p className="section-copy">
+          Ngoai quest board, arena nay da co them mot kho skill rieng. Ban co the xem toan bo skill, related
+          skills, referral docs, raw `SKILL.md`, va hoi AI nen dung skill nao cho tinh huong cu the.
+        </p>
+        <div className="hero-actions">
+          <Link href="/social-listening-arena/skills" className="button-primary">
+            Open Skill Atlas
+          </Link>
+        </div>
+      </section>
+
+      <section className="panel section-block">
         <p className="eyebrow">Feynman shortcuts</p>
         <div className="arena-intro-grid">
           <article className="detail-card">
