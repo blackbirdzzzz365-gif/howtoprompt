@@ -3,9 +3,6 @@ name: Deploy Production
 on:
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 permissions:
   contents: read
   packages: read
@@ -21,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout target ref
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: main
 
