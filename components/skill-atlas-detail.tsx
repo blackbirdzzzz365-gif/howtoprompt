@@ -1,5 +1,8 @@
-import Link from "next/link";
 import { SkillExplainPanel } from "@/components/skill-explain-panel";
+import { LinkButton, buttonClassName } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
+import { DetailPageLayout, DetailPairGrid, StickyAside } from "@/components/ui/layout";
+import { Surface } from "@/components/ui/surface";
 import { type SkillAtlasCatalog } from "@/lib/skill-atlas-catalogs";
 import { type SkillAtlasSkill } from "@/lib/skill-atlas";
 import { formatRawBytes, localizeCategory, localizeSourceLabel } from "@/lib/skill-atlas-ui";
@@ -14,17 +17,17 @@ export function SkillAtlasDetail({
   skill: SkillAtlasSkill;
 }) {
   return (
-    <div className="detail-grid">
-      <section className="panel section-block panel-strong">
+    <DetailPageLayout>
+      <Surface as="section" variant="panelStrong" className="section-block">
         <div className="detail-actions">
-          <Link href={catalog.pagePath} className="button-ghost">
+          <LinkButton href={catalog.pagePath} variant="ghost">
             Quay lại {catalog.shortTitle}
-          </Link>
+          </LinkButton>
           <a
             href={`${catalog.apiPath}/${skill.slug}/raw?ref=skill`}
             target="_blank"
             rel="noreferrer"
-            className="button-secondary"
+            className={buttonClassName("secondary")}
           >
             Raw SKILL.md
           </a>
@@ -36,103 +39,103 @@ export function SkillAtlasDetail({
         <h1 className="section-title">{skill.name}</h1>
         <p className="section-copy">{skill.summaryVi}</p>
 
-        <div className="detail-card" style={{ marginTop: "18px" }}>
+        <Surface variant="detail" style={{ marginTop: "18px" }}>
           <p className="micro-label">Chuyển catalog</p>
           <div className="chip-row" style={{ marginTop: "12px" }}>
             {catalogLinks.map((item) => (
-              <Link
+              <LinkButton
                 key={item.id}
                 href={item.pagePath}
-                className="nav-link"
+                variant="nav"
                 data-active={item.id === catalog.id}
               >
                 {item.shortTitle}
-              </Link>
+              </LinkButton>
             ))}
           </div>
-        </div>
+        </Surface>
 
         <div className="mission-meta" style={{ marginTop: "16px" }}>
-          <span className="chip">{localizeCategory(skill.category)}</span>
-          <span className="outline-chip">{localizeSourceLabel(skill.sourceLabel)}</span>
-          <span className="outline-chip">{formatRawBytes(skill.rawBytes)}</span>
-          <span className="outline-chip">{skill.referencedDocs.length} refs</span>
+          <Chip>{localizeCategory(skill.category)}</Chip>
+          <Chip variant="outline">{localizeSourceLabel(skill.sourceLabel)}</Chip>
+          <Chip variant="outline">{formatRawBytes(skill.rawBytes)}</Chip>
+          <Chip variant="outline">{skill.referencedDocs.length} refs</Chip>
         </div>
 
-        <div className="detail-grid detail-grid-tight" style={{ marginTop: "22px" }}>
-          <article className="detail-card">
+        <DetailPairGrid style={{ marginTop: "22px" }}>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Tiêu đề</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               {skill.heading}
             </p>
-          </article>
-          <article className="detail-card">
+          </Surface>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Đường dẫn nguồn</p>
             <p className="mono-path" style={{ marginTop: "8px" }}>
               {skill.sourcePath}
             </p>
-          </article>
-        </div>
+          </Surface>
+        </DetailPairGrid>
 
         {skill.triggerPhrases.length ? (
-          <article className="detail-card" style={{ marginTop: "18px" }}>
+          <Surface as="article" variant="detail" style={{ marginTop: "18px" }}>
             <p className="micro-label">Trigger phrases</p>
             <div className="tag-row" style={{ marginTop: "12px" }}>
               {skill.triggerPhrases.map((trigger) => (
-                <span key={trigger} className="outline-chip">
+                <Chip key={trigger} variant="outline">
                   {trigger}
-                </span>
+                </Chip>
               ))}
             </div>
-          </article>
+          </Surface>
         ) : null}
 
         {skill.workflowHighlights.length ? (
-          <article className="detail-card" style={{ marginTop: "18px" }}>
+          <Surface as="article" variant="detail" style={{ marginTop: "18px" }}>
             <p className="micro-label">Các bước chính</p>
             <ul className="list-copy" style={{ marginTop: "10px" }}>
               {skill.workflowHighlights.map((step) => (
                 <li key={step}>{step}</li>
               ))}
             </ul>
-          </article>
+          </Surface>
         ) : null}
 
         {skill.guardrails.length ? (
-          <article className="detail-card" style={{ marginTop: "18px" }}>
+          <Surface as="article" variant="detail" style={{ marginTop: "18px" }}>
             <p className="micro-label">Guardrails</p>
             <ul className="list-copy" style={{ marginTop: "10px" }}>
               {skill.guardrails.map((rule) => (
                 <li key={rule}>{rule}</li>
               ))}
             </ul>
-          </article>
+          </Surface>
         ) : null}
 
         {skill.sections.length ? (
-          <article className="detail-card" style={{ marginTop: "18px" }}>
+          <Surface as="article" variant="detail" style={{ marginTop: "18px" }}>
             <p className="micro-label">Các mục được tóm tắt</p>
             <div className="list-stack" style={{ marginTop: "12px" }}>
               {skill.sections.map((section) => (
-                <div key={section.title} className="reference-card">
+                <Surface key={section.title} variant="reference">
                   <strong>{section.title}</strong>
                   <p className="mission-summary" style={{ marginTop: "8px" }}>
                     {section.body}
                   </p>
-                </div>
+                </Surface>
               ))}
             </div>
-          </article>
+          </Surface>
         ) : null}
 
-        <article className="detail-card" style={{ marginTop: "18px" }}>
+        <Surface as="article" variant="detail" style={{ marginTop: "18px" }}>
           <p className="micro-label">Referral docs</p>
           <div className="list-stack" style={{ marginTop: "12px" }}>
             {skill.referencedDocs.length > 0 ? (
               skill.referencedDocs.map((doc) => (
-                <div key={doc.id} className="reference-card">
+                <Surface key={doc.id} variant="reference">
                   <div className="chip-row">
-                    <span className="chip">{doc.exists ? "đã resolve" : "chưa resolve"}</span>
+                    <Chip>{doc.exists ? "đã resolve" : "chưa resolve"}</Chip>
                     <strong>{doc.title}</strong>
                   </div>
                   <p className="mono-path" style={{ marginTop: "8px" }}>
@@ -147,51 +150,51 @@ export function SkillAtlasDetail({
                         href={`${catalog.apiPath}/${skill.slug}/raw?ref=${doc.id}`}
                         target="_blank"
                         rel="noreferrer"
-                        className="button-secondary"
+                        className={buttonClassName("secondary")}
                       >
                         Mở raw doc
                       </a>
                     </div>
                   ) : null}
-                </div>
+                </Surface>
               ))
             ) : (
               <div className="empty-state">Skill này không có referral doc đã được sync.</div>
             )}
           </div>
-        </article>
+        </Surface>
 
-        <article className="detail-card" style={{ marginTop: "18px" }}>
+        <Surface as="article" variant="detail" style={{ marginTop: "18px" }}>
           <p className="micro-label">Xem nhanh raw</p>
           <pre className="example-prompt" style={{ marginTop: "10px", maxHeight: "360px" }}>
             <code>{skill.raw}</code>
           </pre>
-        </article>
-      </section>
+        </Surface>
+      </Surface>
 
-      <aside className="tool-stack">
+      <StickyAside className="tool-stack">
         <SkillExplainPanel catalogId={catalog.id} apiBasePath={catalog.apiPath} skillSlug={skill.slug} />
 
-        <section className="tool-card">
+        <Surface as="section" variant="tool">
           <p className="micro-label">Skill liên quan</p>
           <div className="list-stack" style={{ marginTop: "12px" }}>
             {skill.relatedSkillSlugs.length > 0 ? (
               skill.relatedSkillSlugs.map((relatedSlug, index) => (
-                <Link
+                <LinkButton
                   key={relatedSlug}
                   href={`${catalog.pagePath}/${relatedSlug}`}
-                  className="button-secondary"
+                  variant="secondary"
                 >
                   {skill.relatedSkillNames[index]}
-                </Link>
+                </LinkButton>
               ))
             ) : (
               <div className="empty-state">Skill này chưa có related skill được map từ raw docs.</div>
             )}
           </div>
-        </section>
+        </Surface>
 
-        <section className="tool-card">
+        <Surface as="section" variant="tool">
           <p className="micro-label">Tất cả source paths</p>
           <ul className="list-copy" style={{ marginTop: "12px" }}>
             {skill.allSourcePaths.map((item) => (
@@ -200,8 +203,8 @@ export function SkillAtlasDetail({
               </li>
             ))}
           </ul>
-        </section>
-      </aside>
-    </div>
+        </Surface>
+      </StickyAside>
+    </DetailPageLayout>
   );
 }

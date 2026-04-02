@@ -1,4 +1,6 @@
 import { OpsSummary } from "@/components/ops-summary";
+import { PageSection } from "@/components/ui/layout";
+import { Surface } from "@/components/ui/surface";
 
 const runtimeFacts = [
   {
@@ -38,7 +40,7 @@ const commandDeck = [
 export default function OpsPage() {
   return (
     <>
-      <section className="panel section-block panel-strong">
+      <PageSection strong>
         <p className="eyebrow">Runtime deck</p>
         <h1 className="section-title">Operator facts va command deck tren linuxvm</h1>
         <p className="section-copy">
@@ -48,28 +50,28 @@ export default function OpsPage() {
 
         <div className="runtime-grid" style={{ marginTop: "22px" }}>
           {runtimeFacts.map((item) => (
-            <article key={item.title} className="detail-card">
+            <Surface key={item.title} as="article" variant="detail">
               <p className="micro-label">{item.title}</p>
               <p className="mission-summary" style={{ marginTop: "8px" }}>
                 {item.body}
               </p>
-            </article>
+            </Surface>
           ))}
         </div>
 
         <div className="command-grid" style={{ marginTop: "22px" }}>
           {commandDeck.map((item) => (
-            <article key={item.title} className="detail-card">
+            <Surface key={item.title} as="article" variant="detail">
               <p className="micro-label">{item.title}</p>
               <pre className="example-prompt" style={{ marginTop: "10px" }}>
                 <code>{item.command}</code>
               </pre>
-            </article>
+            </Surface>
           ))}
         </div>
-      </section>
+      </PageSection>
 
-      <section className="panel section-block panel-strong">
+      <PageSection strong>
         <p className="eyebrow">Telemetry</p>
         <h2 className="section-title">Ops snapshot and learning funnel</h2>
         <p className="section-copy">
@@ -79,7 +81,7 @@ export default function OpsPage() {
         <div style={{ marginTop: "22px" }}>
           <OpsSummary />
         </div>
-      </section>
+      </PageSection>
     </>
   );
 }

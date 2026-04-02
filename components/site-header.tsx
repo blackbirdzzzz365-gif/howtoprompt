@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAcademyProgress } from "@/components/app-provider";
+import { Button, LinkButton } from "@/components/ui/button";
 
 const navItems = [
   { href: "/", label: "Start" },
@@ -32,18 +33,18 @@ export function SiteHeader() {
 
         <nav className="header-nav" aria-label="Primary">
           {navItems.map((item) => (
-            <Link
+            <LinkButton
               key={item.href}
               href={item.href}
-              className="nav-link"
+              variant="nav"
               data-active={pathname === item.href || pathname.startsWith(`${item.href}/`)}
             >
               {item.label}
-            </Link>
+            </LinkButton>
           ))}
-          <button type="button" className="nav-link" onClick={toggleReducedMotion}>
+          <Button variant="nav" onClick={toggleReducedMotion}>
             {hydrated && reducedMotion ? "Chuyển động: Tắt" : "Chuyển động: Bật"}
-          </button>
+          </Button>
         </nav>
       </div>
     </header>

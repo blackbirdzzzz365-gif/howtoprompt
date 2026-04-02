@@ -22,6 +22,52 @@
   --radius-xl: 28px;
   --radius-lg: 22px;
   --radius-md: 16px;
+  --color-canvas: var(--background);
+  --color-text-primary: var(--foreground);
+  --color-text-secondary: var(--ink-700);
+  --color-text-muted: var(--muted);
+  --color-surface-default: var(--panel);
+  --color-surface-strong: var(--panel-strong);
+  --color-surface-card: rgba(255, 255, 255, 0.72);
+  --color-surface-card-strong: rgba(255, 255, 255, 0.76);
+  --color-surface-header: rgba(255, 255, 255, 0.78);
+  --color-surface-ghost: rgba(255, 255, 255, 0.45);
+  --color-surface-border: var(--border);
+  --color-grid-line: rgba(39, 65, 95, 0.06);
+  --color-accent-primary: var(--signal-cyan);
+  --color-accent-secondary: var(--mission-amber);
+  --color-feedback-success: var(--success-moss);
+  --color-feedback-danger: var(--alert-coral);
+  --shadow-surface-lg: var(--shadow);
+  --shadow-surface-md: 0 18px 36px rgba(19, 34, 56, 0.12);
+  --shadow-action-hover: 0 18px 40px rgba(19, 34, 56, 0.14);
+  --shadow-orbit-node: 0 12px 30px rgba(19, 34, 56, 0.12);
+  --radius-pill: 999px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --button-primary-bg: linear-gradient(135deg, var(--color-accent-primary), var(--ink-900));
+  --button-primary-fg: white;
+  --button-secondary-bg: white;
+  --button-secondary-fg: var(--color-text-primary);
+  --button-secondary-border: rgba(24, 183, 176, 0.2);
+  --button-ghost-bg: var(--color-surface-ghost);
+  --button-ghost-fg: var(--color-text-primary);
+  --button-ghost-border: var(--color-surface-border);
+  --field-bg: rgba(255, 255, 255, 0.88);
+  --field-border: rgba(39, 65, 95, 0.14);
+  --field-border-focus: rgba(24, 183, 176, 0.64);
+  --field-shadow-focus: 0 0 0 4px rgba(24, 183, 176, 0.12);
+  --card-border: var(--color-surface-border);
+  --card-radius: var(--radius-lg);
+  --card-padding: 18px;
+  --card-bg: var(--color-surface-card);
+  --card-bg-strong: var(--color-surface-card-strong);
 }
 
 @theme inline {
@@ -40,8 +86,8 @@ html {
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-canvas);
+  color: var(--color-text-primary);
   font-family: var(--font-sans);
   background-image:
     radial-gradient(circle at top left, rgba(24, 183, 176, 0.18), transparent 34%),
@@ -76,8 +122,8 @@ textarea {
   inset: 0;
   opacity: 0.72;
   background-image:
-    linear-gradient(rgba(39, 65, 95, 0.06) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(39, 65, 95, 0.06) 1px, transparent 1px);
+    linear-gradient(var(--color-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid-line) 1px, transparent 1px);
   background-size: 96px 96px;
   mask-image: radial-gradient(circle at top, black 58%, transparent 100%);
 }
@@ -102,12 +148,12 @@ textarea {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--color-surface-border);
+  background: var(--color-surface-header);
   backdrop-filter: blur(18px);
   border-radius: 20px;
   padding: 9px 14px;
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-surface-lg);
 }
 
 .brand-lockup {
@@ -141,7 +187,7 @@ textarea {
   line-height: 1.1;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--color-text-muted);
 }
 
 .brand-title,
@@ -166,8 +212,8 @@ textarea {
 
 .nav-link {
   padding: 7px 10px;
-  border-radius: 999px;
-  color: var(--ink-700);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-secondary);
   font-size: 0.94rem;
   transition:
     transform 160ms ease,
@@ -178,20 +224,20 @@ textarea {
 .nav-link:hover,
 .nav-link[data-active="true"] {
   background: rgba(24, 183, 176, 0.12);
-  color: var(--ink-900);
+  color: var(--color-text-primary);
   transform: translateY(-1px);
 }
 
 .panel {
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-xl);
-  background: var(--panel);
-  box-shadow: var(--shadow);
+  background: var(--color-surface-default);
+  box-shadow: var(--shadow-surface-lg);
   backdrop-filter: blur(22px);
 }
 
 .panel-strong {
-  background: var(--panel-strong);
+  background: var(--color-surface-strong);
 }
 
 .section-block {
@@ -206,7 +252,7 @@ textarea {
 }
 
 .section-copy {
-  color: var(--ink-700);
+  color: var(--color-text-secondary);
   max-width: 64ch;
   line-height: 1.7;
 }
@@ -251,7 +297,7 @@ textarea {
   gap: 10px;
   min-height: 48px;
   padding: 0 18px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   transition:
     transform 180ms ease,
@@ -261,25 +307,27 @@ textarea {
 }
 
 .button-primary {
-  background: linear-gradient(135deg, var(--signal-cyan), var(--ink-900));
-  color: white;
+  background: var(--button-primary-bg);
+  color: var(--button-primary-fg);
 }
 
 .button-secondary {
-  background: white;
-  border-color: rgba(24, 183, 176, 0.2);
+  background: var(--button-secondary-bg);
+  border-color: var(--button-secondary-border);
+  color: var(--button-secondary-fg);
 }
 
 .button-ghost {
-  background: rgba(255, 255, 255, 0.45);
-  border-color: var(--border);
+  background: var(--button-ghost-bg);
+  border-color: var(--button-ghost-border);
+  color: var(--button-ghost-fg);
 }
 
 .button-primary:hover,
 .button-secondary:hover,
 .button-ghost:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 40px rgba(19, 34, 56, 0.14);
+  box-shadow: var(--shadow-action-hover);
 }
 
 .orbit-card {
@@ -336,10 +384,10 @@ textarea {
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid var(--border);
-  box-shadow: 0 12px 30px rgba(19, 34, 56, 0.12);
+  box-shadow: var(--shadow-orbit-node);
   font-family: "IBM Plex Mono", var(--font-mono);
   font-size: 0.8rem;
-  color: var(--ink-700);
+  color: var(--color-text-secondary);
 }
 
 .orbit-node[data-slot="owner"] {
@@ -404,15 +452,15 @@ textarea {
 .ops-card,
 .timeline-card,
 .tool-card {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.72);
-  padding: 18px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--card-radius);
+  background: var(--card-bg);
+  padding: var(--card-padding);
 }
 
 .stat-label,
 .micro-label {
-  color: var(--muted);
+  color: var(--color-text-muted);
   font-size: 0.82rem;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -465,24 +513,24 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 8px 12px;
   font-size: 0.88rem;
 }
 
 .chip {
   background: rgba(24, 183, 176, 0.12);
-  color: var(--ink-900);
+  color: var(--color-text-primary);
 }
 
 .status-chip {
   background: rgba(59, 127, 99, 0.14);
-  color: var(--success-moss);
+  color: var(--color-feedback-success);
 }
 
 .outline-chip {
-  border: 1px solid var(--border);
-  color: var(--ink-700);
+  border: 1px solid var(--color-surface-border);
+  color: var(--color-text-secondary);
 }
 
 .mission-grid {
@@ -519,7 +567,7 @@ textarea {
 .list-copy,
 .footer-copy,
 .muted-copy {
-  color: var(--ink-700);
+  color: var(--color-text-secondary);
   line-height: 1.7;
 }
 
@@ -543,7 +591,7 @@ textarea {
   width: 10px;
   height: 10px;
   border-radius: 999px;
-  background: var(--mission-amber);
+  background: var(--color-accent-secondary);
   box-shadow: 0 0 0 8px rgba(231, 164, 59, 0.16);
 }
 
@@ -609,9 +657,9 @@ textarea {
 
 .quest-card,
 .role-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--color-surface-border);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.76);
+  background: var(--card-bg-strong);
   padding: 16px;
   text-align: left;
 }
@@ -653,10 +701,10 @@ textarea {
 .skill-pill {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   padding: 7px 11px;
   background: rgba(19, 34, 56, 0.08);
-  color: var(--ink-900);
+  color: var(--color-text-primary);
   font-size: 0.84rem;
   font-family: "IBM Plex Mono", var(--font-mono);
 }
@@ -702,8 +750,8 @@ textarea {
 .textarea {
   width: 100%;
   border-radius: 18px;
-  border: 1px solid rgba(39, 65, 95, 0.14);
-  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
   padding: 14px 16px;
   outline: none;
   transition:
@@ -715,8 +763,8 @@ textarea {
 .textarea-field {
   width: 100%;
   border-radius: 18px;
-  border: 1px solid rgba(39, 65, 95, 0.14);
-  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid var(--field-border);
+  background: var(--field-bg);
   padding: 14px 16px;
   outline: none;
   transition:
@@ -739,8 +787,8 @@ textarea {
 .textarea:focus,
 .input-field:focus,
 .textarea-field:focus {
-  border-color: rgba(24, 183, 176, 0.64);
-  box-shadow: 0 0 0 4px rgba(24, 183, 176, 0.12);
+  border-color: var(--field-border-focus);
+  box-shadow: var(--field-shadow-focus);
 }
 
 .atlas-toolbar,
@@ -764,17 +812,17 @@ textarea {
 
 .skill-card,
 .reference-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.76);
-  padding: 18px;
+  background: var(--card-bg-strong);
+  padding: var(--card-padding);
 }
 
 .mono-path {
   font-family: "IBM Plex Mono", var(--font-mono);
   font-size: 0.88rem;
   line-height: 1.7;
-  color: var(--ink-700);
+  color: var(--color-text-secondary);
   word-break: break-word;
 }
 
@@ -911,21 +959,21 @@ textarea {
 }
 
 .inline-link {
-  color: var(--ink-900);
+  color: var(--color-text-primary);
   text-decoration: underline;
   text-decoration-color: rgba(24, 183, 176, 0.4);
 }
 
 .status-message {
   min-height: 1.2rem;
-  color: var(--ink-700);
+  color: var(--color-text-secondary);
 }
 
 .empty-state {
   border: 1px dashed rgba(19, 34, 56, 0.18);
   border-radius: var(--radius-lg);
   padding: 18px;
-  color: var(--ink-700);
+  color: var(--color-text-secondary);
 }
 
 @keyframes spin {

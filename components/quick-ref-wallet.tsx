@@ -1,6 +1,8 @@
 "use client";
 
 import { useAcademyProgress } from "@/components/app-provider";
+import { Chip } from "@/components/ui/chip";
+import { Surface } from "@/components/ui/surface";
 import type { QuickRef } from "@/lib/content-schema";
 
 export function QuickRefWallet({ items }: { items: QuickRef[] }) {
@@ -12,10 +14,10 @@ export function QuickRefWallet({ items }: { items: QuickRef[] }) {
         const unlocked = hydrated && quickRefIds.includes(item.id);
 
         return (
-          <article key={item.id} className="quick-ref-card" data-locked={!unlocked}>
+          <Surface key={item.id} as="article" variant="quickRef" data-locked={!unlocked}>
             <div className="chip-row">
-              <span className="chip">{unlocked ? "Unlocked" : "Locked"}</span>
-              <span className="outline-chip">{item.unlocksFromMission}</span>
+              <Chip>{unlocked ? "Unlocked" : "Locked"}</Chip>
+              <Chip variant="outline">{item.unlocksFromMission}</Chip>
             </div>
             <h2 className="mission-title" style={{ marginTop: "14px" }}>
               {item.title}
@@ -38,7 +40,7 @@ export function QuickRefWallet({ items }: { items: QuickRef[] }) {
                 San sang de copy vao prompt that.
               </p>
             ) : null}
-          </article>
+          </Surface>
         );
       })}
     </div>

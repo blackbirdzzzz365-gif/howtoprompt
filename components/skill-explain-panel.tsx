@@ -2,6 +2,9 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { getSkillAtlasCatalog, type SkillAtlasCatalogId } from "@/lib/skill-atlas-catalogs";
+import { Button } from "@/components/ui/button";
+import { FieldGroup, InputField, TextareaField } from "@/components/ui/field";
+import { Surface } from "@/components/ui/surface";
 
 type ExplainResponse = {
   overview_vi: string;
@@ -89,7 +92,7 @@ export function SkillExplainPanel({
   }
 
   return (
-    <section className="tool-card">
+    <Surface as="section" variant="tool">
       <p className="micro-label">AI Explain Mode</p>
       <h2 className="mission-title" style={{ marginTop: "8px" }}>
         Hỏi AI giải thích skill này bằng tiếng Việt
@@ -100,32 +103,28 @@ export function SkillExplainPanel({
       </p>
 
       <form className="list-stack" style={{ marginTop: "16px" }} onSubmit={handleExplain}>
-        <label className="field-group">
-          <span className="micro-label">ChiaseGPU API key</span>
-          <input
-            className="input-field"
+        <FieldGroup label="ChiaseGPU API key">
+          <InputField
             type="password"
             value={apiKey}
             onChange={(event) => setApiKey(event.target.value)}
             placeholder="sk-..."
             required
           />
-        </label>
+        </FieldGroup>
 
-        <label className="field-group">
-          <span className="micro-label">Câu hỏi thêm</span>
-          <textarea
-            className="textarea-field"
+        <FieldGroup label="Câu hỏi thêm">
+          <TextareaField
             rows={5}
             value={question}
             onChange={(event) => setQuestion(event.target.value)}
             placeholder="Ví dụ: giải thích cho tôi như một owner, skill này thực chất bắt agent làm gì, skill con nào nó hay gọi và vì sao?"
           />
-        </label>
+        </FieldGroup>
 
-        <button className="button-primary" type="submit" disabled={loading}>
+        <Button variant="primary" type="submit" disabled={loading}>
           {loading ? "Đang giải thích..." : "Hỏi AI về skill này"}
-        </button>
+        </Button>
       </form>
 
       <p className="muted-copy" style={{ marginTop: "12px" }}>
@@ -147,68 +146,68 @@ export function SkillExplainPanel({
             </div>
           ) : null}
 
-          <article className="detail-card">
+          <Surface as="article" variant="detail">
             <p className="micro-label">Tổng quan</p>
             <p className="mission-summary" style={{ marginTop: "10px" }}>
               {result.overview_vi}
             </p>
-          </article>
+          </Surface>
 
           {result.when_to_use_vi?.length ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Khi nào nên dùng</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.when_to_use_vi.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
-            </article>
+            </Surface>
           ) : null}
 
           {result.workflow_vi?.length ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Workflow</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.workflow_vi.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
-            </article>
+            </Surface>
           ) : null}
 
           {result.guardrails_vi?.length ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Guardrails</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.guardrails_vi.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
-            </article>
+            </Surface>
           ) : null}
 
           {result.related_skills_vi ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Skill liên quan</p>
               <p className="mission-summary" style={{ marginTop: "10px" }}>
                 {result.related_skills_vi}
               </p>
-            </article>
+            </Surface>
           ) : null}
 
           {result.example_prompts_vi?.length ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Prompt ví dụ</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.example_prompts_vi.map((item) => (
                   <li key={item}>{item}</li>
                 ))}
               </ul>
-            </article>
+            </Surface>
           ) : null}
         </div>
       ) : null}
-    </section>
+    </Surface>
   );
 }
 

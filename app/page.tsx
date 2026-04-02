@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { MissionMap } from "@/components/mission-map";
 import { PathChooser } from "@/components/path-chooser";
+import { LinkButton } from "@/components/ui/button";
+import { PageSection } from "@/components/ui/layout";
+import { Surface } from "@/components/ui/surface";
 import { learningPaths, missions, quickRefs } from "@/lib/content";
 
 const loopSteps = [
@@ -45,7 +47,7 @@ export default function HomePage() {
   return (
     <>
       <section className="hero-grid">
-        <div className="panel hero-copy panel-strong">
+        <Surface variant="panelStrong" className="hero-copy">
           <p className="eyebrow">Verified runtime playbook</p>
           <h1 className="display-title">Play the product loop, not just the prompt.</h1>
           <p className="hero-subtitle">
@@ -54,37 +56,37 @@ export default function HomePage() {
             bot, dung runtime that tren linuxvm.
           </p>
           <div className="hero-actions">
-            <Link href="/missions" className="button-primary">
+            <LinkButton href="/missions" variant="primary">
               Open stage map
-            </Link>
-            <Link href="/social-listening-arena" className="button-secondary">
+            </LinkButton>
+            <LinkButton href="/social-listening-arena" variant="secondary">
               Open SL arena
-            </Link>
-            <Link href="/prompt-lab" className="button-secondary">
+            </LinkButton>
+            <LinkButton href="/prompt-lab" variant="secondary">
               Practice gate prompts
-            </Link>
-            <Link href="/simulator" className="button-ghost">
+            </LinkButton>
+            <LinkButton href="/simulator" variant="ghost">
               Run board simulator
-            </Link>
+            </LinkButton>
           </div>
 
           <div className="stats-grid">
-            <div className="stat-card">
+            <Surface variant="stat">
               <p className="stat-label">Stages</p>
               <p className="stat-value">{missions.length}</p>
-            </div>
-            <div className="stat-card">
+            </Surface>
+            <Surface variant="stat">
               <p className="stat-label">Quick refs</p>
               <p className="stat-value">{quickRefs.length}</p>
-            </div>
-            <div className="stat-card">
+            </Surface>
+            <Surface variant="stat">
               <p className="stat-label">Human gates</p>
               <p className="stat-value">2</p>
-            </div>
+            </Surface>
           </div>
-        </div>
+        </Surface>
 
-        <div className="panel orbit-card">
+        <Surface variant="panel" className="orbit-card">
           <div className="orbit-field" />
           <div className="orbit-ring" />
           <div className="orbit-ring-alt" />
@@ -107,10 +109,10 @@ export default function HomePage() {
           <div className="orbit-node" data-slot="prod">
             prod
           </div>
-        </div>
+        </Surface>
       </section>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Choose your path</p>
         <h2 className="section-title">Three ways in</h2>
         <p className="section-copy">
@@ -118,9 +120,9 @@ export default function HomePage() {
           Release Gate cho luc candidate summary da san sang va ban dang sap quyet merge hay replay.
         </p>
         <PathChooser paths={learningPaths} />
-      </section>
+      </PageSection>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Core loop</p>
         <h2 className="section-title">Four turns, two human gates, one repeatable product loop</h2>
         <p className="section-copy">
@@ -129,7 +131,7 @@ export default function HomePage() {
         </p>
         <div className="loop-grid">
           {loopSteps.map((item) => (
-            <article key={item.step} className="signal-card">
+            <Surface key={item.step} as="article" variant="signal">
               <p className="micro-label">Turn {item.step}</p>
               <h3 className="mission-title" style={{ marginTop: "8px" }}>
                 {item.title}
@@ -137,12 +139,12 @@ export default function HomePage() {
               <p className="mission-summary" style={{ marginTop: "10px" }}>
                 {item.body}
               </p>
-            </article>
+            </Surface>
           ))}
         </div>
-      </section>
+      </PageSection>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Dedicated practice</p>
         <h2 className="section-title">Co mot trang rieng chi day OpenClaw bot x Codex cho social-listening-v3</h2>
         <p className="section-copy">
@@ -151,19 +153,19 @@ export default function HomePage() {
           demo cho production raid, contained-fix, new-phase, va merge/revalidate.
         </p>
         <div className="hero-actions">
-          <Link href="/social-listening-arena" className="button-primary">
+          <LinkButton href="/social-listening-arena" variant="primary">
             Enter social listening arena
-          </Link>
-          <Link href="/social-listening-arena/skills" className="button-secondary">
+          </LinkButton>
+          <LinkButton href="/social-listening-arena/skills" variant="secondary">
             Codex host atlas
-          </Link>
-          <Link href="/social-listening-arena/skills-vm-codex" className="button-secondary">
+          </LinkButton>
+          <LinkButton href="/social-listening-arena/skills-vm-codex" variant="secondary">
             Codex linuxvm atlas
-          </Link>
+          </LinkButton>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Mission map</p>
         <h2 className="section-title">From runtime map to merge-or-replay</h2>
         <p className="section-copy">
@@ -171,14 +173,14 @@ export default function HomePage() {
           production, khoa huong, giao executor, va giu merge gate.
         </p>
         <MissionMap missions={missions} compact />
-      </section>
+      </PageSection>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Bot classes</p>
         <h2 className="section-title">Ba class ban se goi nhieu nhat trong campaign nay</h2>
         <div className="signal-grid">
           {botRoles.map((role) => (
-            <article key={role.title} className="signal-card">
+            <Surface key={role.title} as="article" variant="signal">
               <div className="chip-row">
                 <div className="signal-dot" />
                 <strong>{role.title}</strong>
@@ -186,10 +188,10 @@ export default function HomePage() {
               <p className="mission-summary" style={{ marginTop: "12px" }}>
                 {role.body}
               </p>
-            </article>
+            </Surface>
           ))}
         </div>
-      </section>
+      </PageSection>
     </>
   );
 }

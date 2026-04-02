@@ -1,6 +1,7 @@
 "use client";
 
 import { useAcademyProgress } from "@/components/app-provider";
+import { Chip } from "@/components/ui/chip";
 import type { LearningPath } from "@/lib/content-schema";
 
 export function PathChooser({ paths }: { paths: LearningPath[] }) {
@@ -28,8 +29,8 @@ export function PathChooser({ paths }: { paths: LearningPath[] }) {
             Hop voi: {path.recommendedFor}
           </p>
           <div className="chip-row" style={{ marginTop: "16px" }}>
-            <span className="chip">{path.primaryMissionSlugs.length} missions</span>
-            {hydrated && activePathSlug === path.slug ? <span className="status-chip">Dang theo</span> : null}
+            <Chip>{path.primaryMissionSlugs.length} missions</Chip>
+            {hydrated && activePathSlug === path.slug ? <Chip variant="status">Dang theo</Chip> : null}
           </div>
         </button>
       ))}

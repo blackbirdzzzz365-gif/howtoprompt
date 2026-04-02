@@ -56,3 +56,8 @@ pnpm sync:skills
 - AI advisor/explainer goi `https://llm.chiasegpu.vn/v1/chat/completions`; API key duoc user nhap truc tiep tren web.
 - MVP phase 1 uu tien deterministic evaluation thay vi LLM critique.
 - Reduced motion toggle nam tren header.
+
+## Design system pilot
+
+- Pilot 1 artifacts nam tai `docs/design-system/`.
+- Bat dau tu `docs/design-system/README.md` de xem UI inventory, token map, approved component catalog, va page pattern map.

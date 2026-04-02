@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useAcademyProgress } from "@/components/app-provider";
+import { LinkButton } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
+import { Surface } from "@/components/ui/surface";
 import type { Mission } from "@/lib/content-schema";
 
 export function MissionMap({
@@ -19,12 +21,12 @@ export function MissionMap({
         const complete = hydrated && completedMissionSlugs.includes(mission.slug);
 
         return (
-          <article key={mission.slug} className="mission-card" data-complete={complete}>
+          <Surface key={mission.slug} as="article" variant="mission" data-complete={complete}>
             <div className="chip-row">
-              <span className="chip">Stage {String(mission.order).padStart(2, "0")}</span>
-              <span className="outline-chip">{mission.duration}</span>
-              <span className="outline-chip">{mission.focus}</span>
-              {complete ? <span className="status-chip">Cleared</span> : null}
+              <Chip>Stage {String(mission.order).padStart(2, "0")}</Chip>
+              <Chip variant="outline">{mission.duration}</Chip>
+              <Chip variant="outline">{mission.focus}</Chip>
+              {complete ? <Chip variant="status">Cleared</Chip> : null}
             </div>
             <h3 className="mission-title" style={{ marginTop: "14px" }}>
               {mission.title}
@@ -36,17 +38,17 @@ export function MissionMap({
               Outcome: {mission.outcome}
             </p>
             <div className="detail-actions" style={{ marginTop: "18px" }}>
-              <Link href={`/missions/${mission.slug}`} className="button-secondary">
+              <LinkButton href={`/missions/${mission.slug}`} variant="secondary">
                 Enter mission
-              </Link>
+              </LinkButton>
               {mission.practiceMode === "prompt-lab" ? (
-                <Link href="/prompt-lab" className="button-ghost">
+                <LinkButton href="/prompt-lab" variant="ghost">
                   Practice gate
-                </Link>
+                </LinkButton>
               ) : (
-                <Link href={`/simulator?scenario=${mission.slug}`} className="button-ghost">
+                <LinkButton href={`/simulator?scenario=${mission.slug}`} variant="ghost">
                   Run sim
-                </Link>
+                </LinkButton>
               )}
             </div>
             {hydrated && activePathSlug ? (
@@ -54,7 +56,7 @@ export function MissionMap({
                 Active path: {activePathSlug}
               </p>
             ) : null}
-          </article>
+          </Surface>
         );
       })}
     </div>

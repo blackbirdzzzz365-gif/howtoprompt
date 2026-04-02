@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { useAcademyProgress } from "@/components/app-provider";
+import { Button } from "@/components/ui/button";
+import { DetailPageLayout, StickyAside } from "@/components/ui/layout";
+import { Field, PromptTextarea, SelectField } from "@/components/ui/field";
+import { Surface } from "@/components/ui/surface";
 import type { PromptEvaluation } from "@/lib/evaluate-prompt";
 
 const starterPrompts = [
@@ -79,8 +83,8 @@ export function PromptLab() {
   }
 
   return (
-    <div className="detail-grid">
-      <section className="panel section-block panel-strong">
+    <DetailPageLayout>
+      <Surface as="section" variant="panelStrong" className="section-block">
         <p className="eyebrow">Prompt Lab</p>
         <h1 className="section-title">Practice gate prompts truoc khi gui prompt that</h1>
         <p className="section-copy">
@@ -90,60 +94,55 @@ export function PromptLab() {
         </p>
 
         <div className="form-grid" style={{ marginTop: "22px" }}>
-          <div className="field">
-            <label htmlFor="bot">Target bot</label>
-            <select
+          <Field label="Target bot" htmlFor="bot">
+            <SelectField
               id="bot"
-              className="select"
               value={selectedBot}
               onChange={(event) => setSelectedBot(event.target.value)}
             >
               <option value="linux_main">linux_main</option>
               <option value="lavis_linux">lavis_linux</option>
               <option value="gaubot">gaubot</option>
-            </select>
-          </div>
+            </SelectField>
+          </Field>
 
-          <div className="field">
-            <label htmlFor="prompt">Prompt</label>
-            <textarea
+          <Field label="Prompt" htmlFor="prompt">
+            <PromptTextarea
               id="prompt"
-              className="textarea"
               value={promptText}
               onChange={(event) => setPromptText(event.target.value)}
             />
-          </div>
+          </Field>
 
           <div className="detail-actions">
-            <button type="button" className="button-primary" onClick={handleEvaluate} disabled={busy}>
+            <Button variant="primary" onClick={handleEvaluate} disabled={busy}>
               {busy ? "Evaluating..." : "Evaluate prompt"}
-            </button>
-            <button type="button" className="button-ghost" onClick={() => loadExample("executor")}>
+            </Button>
+            <Button variant="ghost" onClick={() => loadExample("executor")}>
               Load executor example
-            </button>
+            </Button>
           </div>
           <p className="status-message">{status}</p>
         </div>
-      </section>
+      </Surface>
 
-      <aside className="tool-stack sticky-console">
-        <section className="tool-card">
+      <StickyAside>
+        <Surface as="section" variant="tool">
           <p className="micro-label">Examples</p>
           <div className="list-stack">
             {starterPrompts.map((example) => (
-              <button
+              <Button
                 key={example.id}
-                type="button"
-                className="button-secondary"
+                variant="secondary"
                 onClick={() => loadExample(example.id)}
               >
                 {example.label}
-              </button>
+              </Button>
             ))}
           </div>
-        </section>
+        </Surface>
 
-        <section className="tool-card">
+        <Surface as="section" variant="tool">
           <p className="micro-label">Rubric</p>
           <ul className="list-copy">
             <li>Clarity: co Codex directive, repo va gate goal ro rang khong</li>
@@ -151,10 +150,10 @@ export function PromptLab() {
             <li>Operational control: co stop rule nhu checkpoint verdict hay candidate summary khong</li>
             <li>Bot fit: task text co hop linux_main, lavis_linux hay gaubot khong</li>
           </ul>
-        </section>
+        </Surface>
 
         {evaluation ? (
-          <section className="tool-card">
+          <Surface as="section" variant="tool">
             <div className="score-band" data-band={evaluation.band}>
               <strong>{evaluation.band}</strong>
               <span>{evaluation.scoreTotal}/100</span>
@@ -183,27 +182,30 @@ export function PromptLab() {
               ))}
             </div>
 
-            <div className="tool-card" style={{ marginTop: "14px", padding: 0, border: "none", background: "transparent" }}>
+            <div
+              className="tool-card"
+              style={{ marginTop: "14px", padding: 0, border: "none", background: "transparent" }}
+            >
               <p className="micro-label">System interpretation</p>
               <p className="muted-copy" style={{ marginTop: "8px" }}>
                 {evaluation.systemInterpretation}
               </p>
               <div className="suggestion-list">
                 {evaluation.rewriteSuggestions.map((suggestion) => (
-                  <div key={suggestion} className="timeline-card" data-tone="warn">
+                  <Surface key={suggestion} variant="timeline" data-tone="warn">
                     {suggestion}
-                  </div>
+                  </Surface>
                 ))}
               </div>
               {(evaluation.band === "Good" || evaluation.band === "Excellent") && (
-                <button type="button" className="button-primary" style={{ marginTop: "16px" }} onClick={handleSendReady}>
+                <Button variant="primary" style={{ marginTop: "16px" }} onClick={handleSendReady}>
                   Mark stage complete
-                </button>
+                </Button>
               )}
             </div>
-          </section>
+          </Surface>
         ) : null}
-      </aside>
-    </div>
+      </StickyAside>
+    </DetailPageLayout>
   );
 }

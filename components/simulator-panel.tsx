@@ -3,6 +3,10 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useAcademyProgress } from "@/components/app-provider";
+import { Button } from "@/components/ui/button";
+import { Field, SelectField } from "@/components/ui/field";
+import { DetailPageLayout, StickyAside } from "@/components/ui/layout";
+import { Surface } from "@/components/ui/surface";
 import { missions, scenarios } from "@/lib/content";
 
 type SimulatorResponse = {
@@ -65,8 +69,8 @@ export function SimulatorPanel() {
   }
 
   return (
-    <div className="detail-grid">
-      <section className="panel section-block panel-strong">
+    <DetailPageLayout>
+      <Surface as="section" variant="panelStrong" className="section-block">
         <p className="eyebrow">System Simulator</p>
         <h1 className="section-title">Xem game board phan ung theo lua chon cua ban</h1>
         <p className="section-copy">
@@ -74,11 +78,9 @@ export function SimulatorPanel() {
           khoa huong, giu merge gate, va recover auth tren linuxvm.
         </p>
 
-        <div className="field" style={{ marginTop: "20px" }}>
-          <label htmlFor="scenario-picker">Scenario</label>
-          <select
+        <Field label="Scenario" htmlFor="scenario-picker" className="field" style={{ marginTop: "20px" }}>
+          <SelectField
             id="scenario-picker"
-            className="select"
             value={scenarioId}
             onChange={(event) => {
               setScenarioId(event.target.value);
@@ -91,10 +93,10 @@ export function SimulatorPanel() {
                 {item.title}
               </option>
             ))}
-          </select>
-        </div>
+          </SelectField>
+        </Field>
 
-        <div className="detail-card" style={{ marginTop: "18px" }}>
+        <Surface variant="detail" style={{ marginTop: "18px" }}>
           <p className="micro-label">Stage anchor</p>
           <h2 className="mission-title" style={{ marginTop: "6px" }}>
             {mission?.title}
@@ -102,9 +104,9 @@ export function SimulatorPanel() {
           <p className="mission-summary" style={{ marginTop: "8px" }}>
             {scenario.summary}
           </p>
-        </div>
+        </Surface>
 
-        <div className="detail-card" style={{ marginTop: "16px" }}>
+        <Surface variant="detail" style={{ marginTop: "16px" }}>
           <p className="micro-label">Prompt</p>
           <h3 className="mission-title" style={{ marginTop: "8px" }}>
             {step.prompt}
@@ -114,61 +116,61 @@ export function SimulatorPanel() {
           </p>
           <div className="list-stack" style={{ marginTop: "18px" }}>
             {step.choices.map((choice) => (
-              <button key={choice.id} type="button" className="button-secondary" onClick={() => runChoice(choice.id)}>
+              <Button key={choice.id} variant="secondary" onClick={() => runChoice(choice.id)}>
                 {choice.label}
-              </button>
+              </Button>
             ))}
           </div>
-        </div>
+        </Surface>
 
         <p className="status-message" style={{ marginTop: "16px" }}>
           {status}
         </p>
-      </section>
+      </Surface>
 
-      <aside className="tool-stack sticky-console">
-        <section className="tool-card">
+      <StickyAside>
+        <Surface as="section" variant="tool">
           <p className="micro-label">Simulator mode</p>
           <p className="muted-copy" style={{ marginTop: "8px" }}>
             Reduced motion: {reducedMotion ? "on" : "off"}.
           </p>
-        </section>
+        </Surface>
 
         {response ? (
           <>
-            <section className="tool-card">
+            <Surface as="section" variant="tool">
               <div className="score-band" data-band={response.isCorrect ? "Good" : "Needs work"}>
                 <strong>{response.isCorrect ? "Correct path" : "Risk detected"}</strong>
               </div>
               <p className="muted-copy" style={{ marginTop: "12px" }}>
                 {response.explanation}
               </p>
-            </section>
+            </Surface>
 
-            <section className="tool-card">
+            <Surface as="section" variant="tool">
               <p className="micro-label">Timeline state</p>
               <div className="timeline-grid" style={{ marginTop: "14px" }}>
                 {response.timelineState.map((item) => (
-                  <div key={`${item.title}-${item.state}`} className="timeline-card" data-tone={item.tone}>
+                  <Surface key={`${item.title}-${item.state}`} variant="timeline" data-tone={item.tone}>
                     <p className="micro-label">{item.title}</p>
                     <h3 style={{ marginTop: "6px" }}>{item.state}</h3>
                     <p className="muted-copy" style={{ marginTop: "8px" }}>
                       {item.description}
                     </p>
-                  </div>
+                  </Surface>
                 ))}
               </div>
-            </section>
+            </Surface>
           </>
         ) : (
-          <section className="tool-card">
+          <Surface as="section" variant="tool">
             <p className="micro-label">Timeline state</p>
             <div className="empty-state" style={{ marginTop: "14px" }}>
               Timeline se xuat hien sau khi ban chon mot phuong an.
             </div>
-          </section>
+          </Surface>
         )}
-      </aside>
-    </div>
+      </StickyAside>
+    </DetailPageLayout>
   );
 }

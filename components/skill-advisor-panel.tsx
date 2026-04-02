@@ -1,8 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState, type FormEvent } from "react";
 import { getSkillAtlasCatalog, type SkillAtlasCatalogId } from "@/lib/skill-atlas-catalogs";
+import { Button, LinkButton } from "@/components/ui/button";
+import { FieldGroup, InputField, TextareaField } from "@/components/ui/field";
+import { Surface } from "@/components/ui/surface";
 import { localizeCategory } from "@/lib/skill-atlas-ui";
 
 type AdvisorSkill = {
@@ -106,7 +108,7 @@ export function SkillAdvisorPanel({
   }
 
   return (
-    <section className="tool-card">
+    <Surface as="section" variant="tool">
       <p className="micro-label">AI Skill Advisor</p>
       <h2 className="mission-title" style={{ marginTop: "8px" }}>
         Nhập mong muốn, AI sẽ gợi ý bộ skill nên dùng trong catalog này
@@ -117,33 +119,29 @@ export function SkillAdvisorPanel({
       </p>
 
       <form className="list-stack" style={{ marginTop: "16px" }} onSubmit={handleSubmit}>
-        <label className="field-group">
-          <span className="micro-label">ChiaseGPU API key</span>
-          <input
-            className="input-field"
+        <FieldGroup label="ChiaseGPU API key">
+          <InputField
             type="password"
             placeholder="sk-..."
             value={apiKey}
             onChange={(event) => setApiKey(event.target.value)}
             required
           />
-        </label>
+        </FieldGroup>
 
-        <label className="field-group">
-          <span className="micro-label">Mong muốn của bạn</span>
-          <textarea
-            className="textarea-field"
+        <FieldGroup label="Mong muốn của bạn">
+          <TextareaField
             rows={7}
             placeholder="Ví dụ: Tôi muốn audit production cho social-listening-v3, dừng ở checkpoint verdict, rồi để tôi chốt contained-fix hay new-phase."
             value={need}
             onChange={(event) => setNeed(event.target.value)}
             required
           />
-        </label>
+        </FieldGroup>
 
-        <button className="button-primary" type="submit" disabled={loading}>
+        <Button variant="primary" type="submit" disabled={loading}>
           {loading ? "Đang hỏi AI..." : "Hỏi AI advisor"}
-        </button>
+        </Button>
       </form>
 
       <p className="muted-copy" style={{ marginTop: "12px" }}>
@@ -165,19 +163,19 @@ export function SkillAdvisorPanel({
             </div>
           ) : null}
 
-          <article className="detail-card">
+          <Surface as="article" variant="detail">
             <p className="micro-label">Kết luận</p>
             <p className="mission-summary" style={{ marginTop: "10px" }}>
               {result.answer_vi}
             </p>
-          </article>
+          </Surface>
 
-          <article className="detail-card">
+          <Surface as="article" variant="detail">
             <p className="micro-label">Skill gợi ý</p>
             <div className="list-stack" style={{ marginTop: "12px" }}>
               {result.recommended_skills.length > 0 ? (
                 result.recommended_skills.map((skill) => (
-                  <div key={skill.slug} className="reference-card">
+                  <Surface key={skill.slug} variant="reference">
                     <div className="chip-row">
                       <span className="chip">{skill.confidence}</span>
                       <strong>{skill.name}</strong>
@@ -186,40 +184,40 @@ export function SkillAdvisorPanel({
                       {skill.reason_vi}
                     </p>
                     <div className="detail-actions" style={{ marginTop: "14px" }}>
-                      <Link href={`${detailBasePath}/${skill.slug}`} className="button-secondary">
+                      <LinkButton href={`${detailBasePath}/${skill.slug}`} variant="secondary">
                         Xem skill này
-                      </Link>
+                      </LinkButton>
                     </div>
-                  </div>
+                  </Surface>
                 ))
               ) : (
                 <div className="empty-state">AI chưa chốt được skill rõ ràng. Hãy nói yêu cầu cụ thể hơn.</div>
               )}
             </div>
-          </article>
+          </Surface>
 
           {result.follow_up_vi ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Prompt tiếp theo</p>
               <p className="mission-summary" style={{ marginTop: "10px" }}>
                 {result.follow_up_vi}
               </p>
-            </article>
+            </Surface>
           ) : null}
 
           {result.notes_vi?.length ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Lưu ý</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {result.notes_vi.map((note) => (
                   <li key={note}>{note}</li>
                 ))}
               </ul>
-            </article>
+            </Surface>
           ) : null}
 
           {shortlist.length > 0 ? (
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Shortlist local trước khi gọi AI</p>
               <div className="list-stack" style={{ marginTop: "10px" }}>
                 {shortlist.map((entry) => (
@@ -232,11 +230,11 @@ export function SkillAdvisorPanel({
                   </div>
                 ))}
               </div>
-            </article>
+            </Surface>
           ) : null}
         </div>
       ) : null}
-    </section>
+    </Surface>
   );
 }
 

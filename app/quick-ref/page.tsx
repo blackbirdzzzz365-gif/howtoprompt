@@ -1,9 +1,10 @@
 import { QuickRefWallet } from "@/components/quick-ref-wallet";
+import { PageSection } from "@/components/ui/layout";
 import { quickRefs } from "@/lib/content";
 
 export default function QuickRefPage() {
   return (
-    <section className="panel section-block panel-strong">
+    <PageSection strong>
       <p className="eyebrow">Quick Ref Wallet</p>
       <h1 className="section-title">Copy-safe cards for daily dispatch va product loop gates</h1>
       <p className="section-copy">
@@ -13,6 +14,6 @@ export default function QuickRefPage() {
       <div style={{ marginTop: "20px" }}>
         <QuickRefWallet items={quickRefs} />
       </div>
-    </section>
+    </PageSection>
   );
 }

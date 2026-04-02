@@ -1,8 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useDeferredValue, useState } from "react";
 import { SkillAdvisorPanel } from "@/components/skill-advisor-panel";
+import { Button, LinkButton } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
+import { InputField } from "@/components/ui/field";
+import { DetailPageLayout, StickyAside } from "@/components/ui/layout";
+import { Surface } from "@/components/ui/surface";
 import { type SkillAtlasCatalog } from "@/lib/skill-atlas-catalogs";
 import { formatRawBytes, localizeCategory, localizeSourceLabel } from "@/lib/skill-atlas-ui";
 
@@ -73,8 +77,8 @@ export function SkillAtlasDirectory({
   });
 
   return (
-    <div className="detail-grid">
-      <section className="panel section-block panel-strong">
+    <DetailPageLayout>
+      <Surface as="section" variant="panelStrong" className="section-block">
         <p className="eyebrow">{catalog.eyebrow}</p>
         <h1 className="section-title">{catalog.title}</h1>
         <p className="section-copy">
@@ -82,52 +86,51 @@ export function SkillAtlasDirectory({
           `SKILL.md`, và referral docs để bạn đọc lại hoặc hỏi AI.
         </p>
 
-        <div className="detail-card" style={{ marginTop: "22px" }}>
+        <Surface variant="detail" style={{ marginTop: "22px" }}>
           <p className="micro-label">Chuyển catalog</p>
           <div className="chip-row" style={{ marginTop: "12px" }}>
             {catalogLinks.map((item) => (
-              <Link
+              <LinkButton
                 key={item.id}
                 href={item.pagePath}
-                className="nav-link"
+                variant="nav"
                 data-active={item.id === catalog.id}
               >
                 {item.shortTitle}
-              </Link>
+              </LinkButton>
             ))}
           </div>
-        </div>
+        </Surface>
 
         <div className="stats-grid" style={{ marginTop: "22px" }}>
-          <div className="stat-card">
+          <Surface variant="stat">
             <p className="stat-label">Skills</p>
             <p className="stat-value">{skillCount}</p>
-          </div>
-          <div className="stat-card">
+          </Surface>
+          <Surface variant="stat">
             <p className="stat-label">Refs</p>
             <p className="stat-value">{referenceCount}</p>
-          </div>
-          <div className="stat-card">
+          </Surface>
+          <Surface variant="stat">
             <p className="stat-label">Snapshot</p>
             <p className="stat-value" style={{ fontSize: "1.15rem" }}>
               {new Date(generatedAt).toLocaleString("vi-VN")}
             </p>
-          </div>
+          </Surface>
         </div>
 
-        <div className="detail-card" style={{ marginTop: "22px" }}>
+        <Surface variant="detail" style={{ marginTop: "22px" }}>
           <p className="micro-label">Mô hình sync</p>
           <p className="mission-summary" style={{ marginTop: "8px" }}>
             Production site không đọc trực tiếp filesystem skill gốc. Vì vậy atlas này được sync thành JSON DB rồi
             mới deploy. {catalog.syncHint}
           </p>
-        </div>
+        </Surface>
 
         <div className="atlas-toolbar" style={{ marginTop: "22px" }}>
           <label className="field-group atlas-search">
             <span className="micro-label">Tìm skill</span>
-            <input
-              className="input-field"
+            <InputField
               type="text"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
@@ -135,35 +138,33 @@ export function SkillAtlasDirectory({
             />
           </label>
           <div className="chip-row">
-            <button
-              type="button"
-              className="nav-link"
+            <Button
+              variant="nav"
               data-active={activeCategory === "Tất cả"}
               onClick={() => setActiveCategory("Tất cả")}
             >
               Tất cả
-            </button>
+            </Button>
             {categories.map((category) => (
-              <button
+              <Button
                 key={category}
-                type="button"
-                className="nav-link"
+                variant="nav"
                 data-active={activeCategory === category}
                 onClick={() => setActiveCategory(category)}
               >
                 {localizeCategory(category)}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
 
         <div className="skill-grid" style={{ marginTop: "22px" }}>
           {filteredSkills.map((skill) => (
-            <article key={skill.slug} className="skill-card">
+            <Surface key={skill.slug} as="article" variant="skill">
               <div className="chip-row">
-                <span className="chip">{localizeCategory(skill.category)}</span>
-                {skill.isAlias ? <span className="outline-chip">alias</span> : null}
-                <span className="outline-chip">{localizeSourceLabel(skill.sourceLabel)}</span>
+                <Chip>{localizeCategory(skill.category)}</Chip>
+                {skill.isAlias ? <Chip variant="outline">alias</Chip> : null}
+                <Chip variant="outline">{localizeSourceLabel(skill.sourceLabel)}</Chip>
               </div>
 
               <h2 className="mission-title" style={{ marginTop: "14px" }}>
@@ -178,9 +179,9 @@ export function SkillAtlasDirectory({
 
               <div className="tag-row" style={{ marginTop: "14px" }}>
                 {skill.triggerPhrases.slice(0, 4).map((trigger) => (
-                  <span key={trigger} className="outline-chip">
+                  <Chip key={trigger} variant="outline">
                     {trigger}
-                  </span>
+                  </Chip>
                 ))}
               </div>
 
@@ -197,11 +198,11 @@ export function SkillAtlasDirectory({
                 <span className="muted-copy">
                   {skill.referencedDocCount} refs • {skill.relatedSkillNames.length} related • {formatRawBytes(skill.rawBytes)}
                 </span>
-                <Link href={`${catalog.pagePath}/${skill.slug}`} className="button-secondary">
+                <LinkButton href={`${catalog.pagePath}/${skill.slug}`} variant="secondary">
                   Mở chi tiết
-                </Link>
+                </LinkButton>
               </div>
-            </article>
+            </Surface>
           ))}
         </div>
 
@@ -210,16 +211,16 @@ export function SkillAtlasDirectory({
             Không có skill nào khớp bộ lọc hiện tại.
           </div>
         ) : null}
-      </section>
+      </Surface>
 
-      <aside className="tool-stack">
+      <StickyAside className="tool-stack">
         <SkillAdvisorPanel
           catalogId={catalog.id}
           apiBasePath={catalog.apiPath}
           detailBasePath={catalog.pagePath}
         />
 
-        <section className="tool-card">
+        <Surface as="section" variant="tool">
           <p className="micro-label">Cách học nhanh</p>
           <ul className="list-copy" style={{ marginTop: "12px" }}>
             <li>Bắt đầu từ skill list để nắm map tổng thể.</li>
@@ -227,20 +228,20 @@ export function SkillAtlasDirectory({
             <li>Vào trang chi tiết của từng skill để đọc workflow, guardrails, related skills và raw docs.</li>
             <li>Khi skill đổi, hãy sync snapshot mới rồi deploy lại để web không bị lệch thực tế.</li>
           </ul>
-        </section>
+        </Surface>
 
-        <section className="tool-card">
+        <Surface as="section" variant="tool">
           <p className="micro-label">Quay lại arena</p>
           <p className="mission-summary" style={{ marginTop: "8px" }}>
             Nếu bạn muốn học theo game flow owner -&gt; bot -&gt; Codex -&gt; prod, hãy quay lại quest board chính.
           </p>
           <div className="detail-actions" style={{ marginTop: "16px" }}>
-            <Link href="/social-listening-arena" className="button-primary">
+            <LinkButton href="/social-listening-arena" variant="primary">
               Quay lại SL Arena
-            </Link>
+            </LinkButton>
           </div>
-        </section>
-      </aside>
-    </div>
+        </Surface>
+      </StickyAside>
+    </DetailPageLayout>
   );
 }
