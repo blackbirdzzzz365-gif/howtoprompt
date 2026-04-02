@@ -13,7 +13,18 @@ export function PageSection({
   strong?: boolean;
 }) {
   const Tag = as;
-  return <Tag className={cn("panel", "section-block", strong && "panel-strong", className)} {...props} />;
+  return (
+    <Tag
+      className={cn(
+        "surface",
+        "panel",
+        "section-block",
+        strong ? "surface-hero panel-strong" : "surface-elevated",
+        className,
+      )}
+      {...props}
+    />
+  );
 }
 
 export function DetailPageLayout({

@@ -10,17 +10,22 @@ import { cn } from "@/lib/utils";
 export function Field({
   label,
   htmlFor,
+  hint,
   className,
   children,
   ...props
 }: HTMLAttributes<HTMLDivElement> & {
   label: ReactNode;
   htmlFor: string;
+  hint?: ReactNode;
   children: ReactNode;
 }) {
   return (
     <div className={cn("field", className)} {...props}>
-      <label htmlFor={htmlFor}>{label}</label>
+      <div className="field-label-row">
+        <label htmlFor={htmlFor}>{label}</label>
+        {hint ? <p className="field-hint">{hint}</p> : null}
+      </div>
       {children}
     </div>
   );

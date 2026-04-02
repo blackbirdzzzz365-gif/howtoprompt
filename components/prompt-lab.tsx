@@ -84,17 +84,23 @@ export function PromptLab() {
 
   return (
     <DetailPageLayout>
-      <Surface as="section" variant="panelStrong" className="section-block">
-        <p className="eyebrow">Prompt Lab</p>
-        <h1 className="section-title">Practice gate prompts truoc khi gui prompt that</h1>
-        <p className="section-copy">
-          Prompt Lab cham theo 4 truc: clarity, context safety, operational control va bot fit. Muc tieu
-          cua campaign nay la giu <strong>one gate, one prompt</strong> va dua prompt len it nhat muc{" "}
-          <strong>Good</strong>.
-        </p>
+      <Surface as="section" variant="hero" className="section-block stack-xl">
+        <div className="stack-sm">
+          <p className="eyebrow">Prompt Lab</p>
+          <h1 className="section-title">Practice gate prompts truoc khi gui prompt that</h1>
+          <p className="section-copy">
+            Prompt Lab chấm theo 4 trục: clarity, context safety, operational control và bot fit. Mục tiêu của
+            campaign này là giữ <strong>one gate, one prompt</strong> và đưa prompt lên ít nhất mức{" "}
+            <strong>Good</strong>.
+          </p>
+        </div>
 
-        <div className="form-grid" style={{ marginTop: "22px" }}>
-          <Field label="Target bot" htmlFor="bot">
+        <div className="form-grid">
+          <Field
+            label="Target bot"
+            htmlFor="bot"
+            hint="Chỉ chọn bot bạn thực sự định giao việc. Sai bot thì prompt tốt mấy cũng lệch."
+          >
             <SelectField
               id="bot"
               value={selectedBot}
@@ -106,7 +112,11 @@ export function PromptLab() {
             </SelectField>
           </Field>
 
-          <Field label="Prompt" htmlFor="prompt">
+          <Field
+            label="Prompt"
+            htmlFor="prompt"
+            hint="Prompt tốt phải nói rõ repo, mục tiêu, stop rule và điểm dừng để bot không phải đoán."
+          >
             <PromptTextarea
               id="prompt"
               value={promptText}
@@ -115,10 +125,10 @@ export function PromptLab() {
           </Field>
 
           <div className="detail-actions">
-            <Button variant="primary" onClick={handleEvaluate} disabled={busy}>
+            <Button variant="primary" size="lg" onClick={handleEvaluate} disabled={busy}>
               {busy ? "Evaluating..." : "Evaluate prompt"}
             </Button>
-            <Button variant="ghost" onClick={() => loadExample("executor")}>
+            <Button variant="secondary" size="lg" onClick={() => loadExample("executor")}>
               Load executor example
             </Button>
           </div>
@@ -127,13 +137,14 @@ export function PromptLab() {
       </Surface>
 
       <StickyAside>
-        <Surface as="section" variant="tool">
+        <Surface as="section" variant="elevated" className="stack-sm">
           <p className="micro-label">Examples</p>
           <div className="list-stack">
             {starterPrompts.map((example) => (
               <Button
                 key={example.id}
                 variant="secondary"
+                size="sm"
                 onClick={() => loadExample(example.id)}
               >
                 {example.label}
@@ -142,7 +153,7 @@ export function PromptLab() {
           </div>
         </Surface>
 
-        <Surface as="section" variant="tool">
+        <Surface as="section" variant="elevated" className="stack-sm">
           <p className="micro-label">Rubric</p>
           <ul className="list-copy">
             <li>Clarity: co Codex directive, repo va gate goal ro rang khong</li>
@@ -153,7 +164,7 @@ export function PromptLab() {
         </Surface>
 
         {evaluation ? (
-          <Surface as="section" variant="tool">
+          <Surface as="section" variant="elevated" className="stack-md">
             <div className="score-band" data-band={evaluation.band}>
               <strong>{evaluation.band}</strong>
               <span>{evaluation.scoreTotal}/100</span>
@@ -182,14 +193,9 @@ export function PromptLab() {
               ))}
             </div>
 
-            <div
-              className="tool-card"
-              style={{ marginTop: "14px", padding: 0, border: "none", background: "transparent" }}
-            >
+            <div className="stack-sm">
               <p className="micro-label">System interpretation</p>
-              <p className="muted-copy" style={{ marginTop: "8px" }}>
-                {evaluation.systemInterpretation}
-              </p>
+              <p className="muted-copy">{evaluation.systemInterpretation}</p>
               <div className="suggestion-list">
                 {evaluation.rewriteSuggestions.map((suggestion) => (
                   <Surface key={suggestion} variant="timeline" data-tone="warn">
@@ -198,7 +204,7 @@ export function PromptLab() {
                 ))}
               </div>
               {(evaluation.band === "Good" || evaluation.band === "Excellent") && (
-                <Button variant="primary" style={{ marginTop: "16px" }} onClick={handleSendReady}>
+                <Button variant="primary" size="lg" onClick={handleSendReady}>
                   Mark stage complete
                 </Button>
               )}

@@ -2,9 +2,12 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 const chipVariants = {
-  solid: "chip",
-  outline: "outline-chip",
-  status: "status-chip",
+  neutral: "chip chip-neutral",
+  accent: "chip chip-accent",
+  outline: "chip chip-outline",
+  success: "chip chip-success",
+  solid: "chip chip-accent",
+  status: "chip chip-success",
 } as const;
 
 export type ChipVariant = keyof typeof chipVariants;

@@ -406,51 +406,60 @@ export function SocialListeningArena() {
 
   return (
     <>
-      <Surface as="section" variant="panelStrong" className="section-block arena-hero">
-        <p className="eyebrow">Dedicated demo page</p>
-        <h1 className="display-title">Social Listening Arena</h1>
-        <p className="hero-subtitle">
-          Trang nay chi day mot viec: dung OpenClaw bot de dieu khien Codex tiep tuc phat trien
-          `social-listening-v3` dung gate, dung bot, dung skill, va dung artifact.
-        </p>
+      <Surface as="section" variant="hero" className="section-block stack-lg arena-hero">
+        <div className="stack-sm">
+          <p className="eyebrow">Dedicated demo page</p>
+          <h1 className="display-title">Social Listening Arena</h1>
+          <p className="hero-subtitle">
+            Trang này chỉ dạy một việc: dùng OpenClaw bot để điều khiển Codex tiếp tục phát triển
+            `social-listening-v3` đúng gate, đúng bot, đúng skill và đúng artifact.
+          </p>
+        </div>
+        <div className="chip-row">
+          <Chip variant="accent">Production truth first</Chip>
+          <Chip variant="outline">2 human gates</Chip>
+          <Chip variant="outline">Audit → Lock → Execute → Revalidate</Chip>
+        </div>
         <div className="hero-actions">
-          <LinkButton href="/prompt-lab" variant="primary">
+          <LinkButton href="/prompt-lab" variant="primary" size="lg">
             Practice prompts first
           </LinkButton>
-          <LinkButton href="/ops" variant="secondary">
+          <LinkButton href="/ops" variant="secondary" size="lg">
             Open runtime deck
           </LinkButton>
-          <LinkButton href="/missions" variant="ghost">
+          <LinkButton href="/missions" variant="ghost" size="lg">
             Return to stage map
           </LinkButton>
         </div>
       </Surface>
 
-      <PageSection>
-        <p className="eyebrow">How to read this board</p>
+      <PageSection className="stack-lg">
+        <div className="stack-sm">
+          <p className="eyebrow">How to read this board</p>
+          <h2 className="section-title">Một board duy nhất để đọc owner prompt, bot dispatch và Codex execution</h2>
+        </div>
         <div className="arena-intro-grid">
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">You say</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Cau prompt that ban nen noi voi bot. Neu gate sai, ca quest se lech.
-            </p>
+            <p className="mission-summary">Câu prompt thật bạn nên nói với bot. Nếu gate sai, cả quest sẽ lệch.</p>
           </Surface>
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Bot to Codex</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Bot la dispatcher giu ticket, boundary, va stop rule. No khong thay Codex lam viec ky thuat.
+            <p className="mission-summary">
+              Bot là dispatcher giữ ticket, boundary và stop rule. Nó không thay Codex làm việc kỹ thuật.
             </p>
           </Surface>
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Codex does</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Codex doc skills, doc repo, chay lenh, sua file, tao artifact, va tra lai bang chung cho bot.
+            <p className="mission-summary">
+              Codex đọc skills, đọc repo, chạy lệnh, sửa file, tạo artifact và trả lại bằng chứng cho bot.
             </p>
           </Surface>
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Loot / gate</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Moi quest co mot loot ro rang: checkpoint verdict hoac candidate summary. Khong co loot do thi chua duoc qua gate.
+            <p className="mission-summary">
+              Mỗi quest có một loot rõ ràng: checkpoint verdict hoặc candidate summary. Không có loot đó thì
+              chưa được qua gate.
             </p>
           </Surface>
         </div>
@@ -458,84 +467,73 @@ export function SocialListeningArena() {
 
       <div className="arena-layout">
         <aside className="quest-rail">
-          <Surface as="section" variant="tool">
+          <Surface as="section" variant="elevated" className="stack-sm">
             <p className="micro-label">Quest board</p>
-            <div className="list-stack" style={{ marginTop: "14px" }}>
+            <div className="list-stack">
               {quests.map((item) => (
                 <button
                   key={item.id}
                   type="button"
-                  className="quest-card"
+                  className="quest-card stack-md"
                   data-active={item.id === quest.id}
                   onClick={() => {
                     void selectQuest(item.id);
                   }}
                 >
                   <div className="chip-row">
-                    <Chip>{item.difficulty}</Chip>
+                    <Chip variant="accent">{item.difficulty}</Chip>
                     <Chip variant="outline">{item.turns.length} turns</Chip>
                   </div>
-                  <h2 className="mission-title" style={{ marginTop: "12px" }}>
-                    {item.title}
-                  </h2>
-                  <p className="mission-summary" style={{ marginTop: "8px" }}>
-                    {item.objective}
-                  </p>
+                  <h2 className="mission-title">{item.title}</h2>
+                  <p className="mission-summary">{item.objective}</p>
                 </button>
               ))}
             </div>
           </Surface>
 
-          <Surface as="section" variant="tool">
+          <Surface as="section" variant="elevated" className="stack-sm">
             <p className="micro-label">Party for this quest</p>
-            <div className="tag-row" style={{ marginTop: "12px" }}>
+            <div className="tag-row">
               {quest.party.map((roleId) => {
                 const role = roles.find((item) => item.id === roleId);
-                return <Chip key={roleId}>{role?.name ?? roleId}</Chip>;
+                return <Chip key={roleId} variant="neutral">{role?.name ?? roleId}</Chip>;
               })}
             </div>
-            <p className="muted-copy" style={{ marginTop: "12px" }}>
-              {quest.whenToPlay}
-            </p>
+            <p className="muted-copy">{quest.whenToPlay}</p>
           </Surface>
         </aside>
 
-        <Surface as="section" variant="panelStrong" className="section-block">
+        <Surface as="section" variant="hero" className="section-block stack-xl">
           <div className="chip-row">
-            <Chip>{quest.difficulty}</Chip>
+            <Chip variant="accent">{quest.difficulty}</Chip>
             <Chip variant="outline">
               Turn {turnIndex + 1}/{quest.turns.length}
             </Chip>
           </div>
-          <h2 className="section-title" style={{ marginTop: "16px" }}>
-            {quest.title}
-          </h2>
-          <p className="section-copy">{quest.objective}</p>
+          <div className="stack-sm">
+            <h2 className="section-title">{quest.title}</h2>
+            <p className="section-copy">{quest.objective}</p>
+          </div>
 
-          <div className="arena-meta-grid" style={{ marginTop: "20px" }}>
-            <Surface as="article" variant="detail">
+          <div className="arena-meta-grid">
+            <Surface as="article" variant="subtle" className="stack-xs">
               <p className="micro-label">When to play</p>
-              <p className="mission-summary" style={{ marginTop: "8px" }}>
-                {quest.whenToPlay}
-              </p>
+              <p className="mission-summary">{quest.whenToPlay}</p>
             </Surface>
-            <Surface as="article" variant="detail">
+            <Surface as="article" variant="subtle" className="stack-xs">
               <p className="micro-label">Win condition</p>
-              <p className="mission-summary" style={{ marginTop: "8px" }}>
-                {quest.winCondition}
-              </p>
+              <p className="mission-summary">{quest.winCondition}</p>
             </Surface>
-            <Surface as="article" variant="detail">
+            <Surface as="article" variant="subtle" className="stack-xs">
               <p className="micro-label">Common bad move</p>
-              <p className="mission-summary" style={{ marginTop: "8px" }}>
-                {quest.badMove}
-              </p>
+              <p className="mission-summary">{quest.badMove}</p>
             </Surface>
           </div>
 
-          <div className="detail-actions" style={{ marginTop: "20px" }}>
+          <div className="detail-actions">
             <Button
               variant="ghost"
+              size="sm"
               onClick={() => {
                 void moveTurn(-1);
               }}
@@ -545,6 +543,7 @@ export function SocialListeningArena() {
             </Button>
             <Button
               variant="primary"
+              size="sm"
               onClick={() => {
                 void moveTurn(1);
               }}
@@ -554,45 +553,39 @@ export function SocialListeningArena() {
             </Button>
           </div>
 
-          <div className="arena-turn-grid" style={{ marginTop: "22px" }}>
-            <Surface as="article" variant="detail">
+          <div className="arena-turn-grid">
+            <Surface as="article" variant="code" className="stack-xs">
               <p className="micro-label">{turn.title}</p>
-              <pre className="example-prompt" style={{ marginTop: "12px" }}>
+              <pre className="example-prompt">
                 <code>{turn.ownerLine}</code>
               </pre>
             </Surface>
 
-            <Surface as="article" variant="detail">
+            <Surface as="article" variant="subtle" className="stack-xs">
               <p className="micro-label">Bot interacts with Codex</p>
-              <p className="mission-summary" style={{ marginTop: "10px" }}>
-                {turn.botMove}
-              </p>
+              <p className="mission-summary">{turn.botMove}</p>
             </Surface>
 
-            <Surface as="article" variant="detail">
+            <Surface as="article" variant="subtle" className="stack-xs">
               <p className="micro-label">Codex does</p>
-              <p className="mission-summary" style={{ marginTop: "10px" }}>
-                {turn.codexMove}
-              </p>
+              <p className="mission-summary">{turn.codexMove}</p>
             </Surface>
 
-            <Surface as="article" variant="detail">
+            <Surface as="article" variant="subtle" className="stack-sm">
               <p className="micro-label">Loot and stop rule</p>
-              <ul className="list-copy" style={{ marginTop: "10px" }}>
+              <ul className="list-copy">
                 {turn.artifacts.map((artifact) => (
                   <li key={artifact}>{artifact}</li>
                 ))}
               </ul>
-              <p className="muted-copy" style={{ marginTop: "12px" }}>
-                {turn.stopRule}
-              </p>
+              <p className="muted-copy">{turn.stopRule}</p>
             </Surface>
           </div>
 
-          <div className="arena-support-grid" style={{ marginTop: "20px" }}>
-            <Surface as="article" variant="tool">
+          <div className="arena-support-grid">
+            <Surface as="article" variant="elevated" className="stack-sm">
               <p className="micro-label">Skill loadout</p>
-              <div className="tag-row" style={{ marginTop: "12px" }}>
+              <div className="tag-row">
                 {turn.skills.map((skill) => (
                   <span key={skill} className="skill-pill">
                     {skill}
@@ -601,36 +594,36 @@ export function SocialListeningArena() {
               </div>
             </Surface>
 
-            <Surface as="article" variant="tool">
+            <Surface as="article" variant="elevated" className="stack-xs">
               <p className="micro-label">Why this turn matters</p>
-              <p className="muted-copy" style={{ marginTop: "10px" }}>
-                {turn.takeaway}
-              </p>
+              <p className="muted-copy">{turn.takeaway}</p>
             </Surface>
           </div>
         </Surface>
       </div>
 
-      <PageSection>
-        <p className="eyebrow">Party roles</p>
-        <h2 className="section-title">Ai lam gi trong game nay</h2>
+      <PageSection className="stack-lg">
+        <div className="stack-sm">
+          <p className="eyebrow">Party roles</p>
+          <h2 className="section-title">Ai lam gi trong game nay</h2>
+        </div>
         <div className="role-grid">
           {roles.map((role) => (
-            <Surface key={role.id} as="article" variant="role" data-active={activeRoleIds.includes(role.id)}>
+            <Surface
+              key={role.id}
+              as="article"
+              variant="interactive"
+              className="role-card stack-sm"
+              data-active={activeRoleIds.includes(role.id)}
+            >
               <div className="chip-row">
-                <Chip>{role.classLabel}</Chip>
-                {activeRoleIds.includes(role.id) ? <Chip variant="status">Active in quest</Chip> : null}
+                <Chip variant="neutral">{role.classLabel}</Chip>
+                {activeRoleIds.includes(role.id) ? <Chip variant="success">Active in quest</Chip> : null}
               </div>
-              <h3 className="mission-title" style={{ marginTop: "12px" }}>
-                {role.name}
-              </h3>
-              <p className="mission-summary" style={{ marginTop: "8px" }}>
-                {role.summary}
-              </p>
-              <p className="muted-copy" style={{ marginTop: "12px" }}>
-                {role.bestFor}
-              </p>
-              <div className="tag-row" style={{ marginTop: "14px" }}>
+              <h3 className="mission-title">{role.name}</h3>
+              <p className="mission-summary">{role.summary}</p>
+              <p className="muted-copy">{role.bestFor}</p>
+              <div className="tag-row">
                 {role.skills.map((skill) => (
                   <span key={skill} className="skill-pill">
                     {skill}
@@ -642,51 +635,57 @@ export function SocialListeningArena() {
         </div>
       </PageSection>
 
-      <PageSection>
-        <p className="eyebrow">Skill Atlas</p>
-        <h2 className="section-title">Muốn tra cứu skill của host, Codex linuxvm và OpenClaw linuxvm ở một chỗ</h2>
-        <p className="section-copy">
-          Ngoài quest board, arena này còn có ba kho skill riêng. Bạn có thể tra cứu skill trên host, bundle Codex
-          trên `linuxvm`, và bundle OpenClaw trên `linuxvm`, rồi hỏi AI nên dùng skill nào cho đúng tình huống.
-        </p>
+      <PageSection className="stack-lg">
+        <div className="stack-sm">
+          <p className="eyebrow">Skill Atlas</p>
+          <h2 className="section-title">Muốn tra cứu skill của host, Codex linuxvm và OpenClaw linuxvm ở một chỗ</h2>
+          <p className="section-copy">
+            Ngoài quest board, arena này còn có ba kho skill riêng. Bạn có thể tra cứu skill trên host, bundle
+            Codex trên `linuxvm` và bundle OpenClaw trên `linuxvm`, rồi hỏi AI nên dùng skill nào cho đúng tình
+            huống.
+          </p>
+        </div>
         <div className="hero-actions">
-          <LinkButton href="/social-listening-arena/skills" variant="primary">
+          <LinkButton href="/social-listening-arena/skills" variant="primary" size="lg">
             Codex host
           </LinkButton>
-          <LinkButton href="/social-listening-arena/skills-vm-codex" variant="secondary">
+          <LinkButton href="/social-listening-arena/skills-vm-codex" variant="secondary" size="lg">
             Codex linuxvm
           </LinkButton>
-          <LinkButton href="/social-listening-arena/skills-vm-openclaw" variant="secondary">
+          <LinkButton href="/social-listening-arena/skills-vm-openclaw" variant="secondary" size="lg">
             OpenClaw linuxvm
           </LinkButton>
         </div>
       </PageSection>
 
-      <PageSection>
-        <p className="eyebrow">Feynman shortcuts</p>
+      <PageSection className="stack-lg">
+        <div className="stack-sm">
+          <p className="eyebrow">Feynman shortcuts</p>
+          <h2 className="section-title">Những câu ngắn để nhớ đúng vai trò của từng actor</h2>
+        </div>
         <div className="arena-intro-grid">
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Bot is not the coder</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Bot giong nhu nguoi doi truong giu boi canh, ticket, stop rule, va ket noi ban voi Codex.
+            <p className="mission-summary">
+              Bot giống như người đội trưởng giữ bối cảnh, ticket, stop rule và kết nối bạn với Codex.
             </p>
           </Surface>
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Codex is the worker</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Codex moi la thang doc file, chay script, tao branch, sua code, va viet artifact.
+            <p className="mission-summary">
+              Codex mới là thằng đọc file, chạy script, tạo branch, sửa code và viết artifact.
             </p>
           </Surface>
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Owner controls the gates</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Neu ban khong noi `Chot huong:` hoac `khong merge neu toi chua chot`, he thong se phai doan y ban.
+            <p className="mission-summary">
+              Nếu bạn không nói `Chot huong:` hoặc `khong merge neu toi chua chot`, hệ thống sẽ phải đoán ý bạn.
             </p>
           </Surface>
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Production closes the loop</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              Deploy chi la o giua game. Revalidation tren production that moi cho biet quest co thang hay khong.
+            <p className="mission-summary">
+              Deploy chỉ là ở giữa game. Revalidation trên production thật mới cho biết quest có thắng hay không.
             </p>
           </Surface>
         </div>

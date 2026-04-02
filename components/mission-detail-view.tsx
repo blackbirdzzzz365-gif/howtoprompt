@@ -18,40 +18,36 @@ export function MissionDetailView({
 }) {
   return (
     <DetailPageLayout>
-      <Surface as="section" variant="panelStrong" className="section-block">
-        <p className="eyebrow">Stage {String(mission.order).padStart(2, "0")}</p>
-        <h1 className="section-title">{mission.title}</h1>
-        <p className="section-copy">{mission.tagline}</p>
+      <Surface as="section" variant="hero" className="section-block stack-xl">
+        <div className="stack-sm">
+          <p className="eyebrow">Stage {String(mission.order).padStart(2, "0")}</p>
+          <h1 className="section-title">{mission.title}</h1>
+          <p className="section-copy">{mission.tagline}</p>
+        </div>
 
-        <div className="mission-meta" style={{ marginTop: "16px" }}>
-          <Chip>{mission.duration}</Chip>
+        <div className="mission-meta">
+          <Chip variant="accent">{mission.duration}</Chip>
           <Chip variant="outline">{mission.practiceMode}</Chip>
           <Chip variant="outline">{mission.focus}</Chip>
         </div>
 
-        <DetailPairGrid style={{ marginTop: "22px" }}>
-          <Surface as="article" variant="detail">
+        <DetailPairGrid>
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Use when</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              {mission.useWhen}
-            </p>
+            <p className="mission-summary">{mission.useWhen}</p>
           </Surface>
-          <Surface as="article" variant="detail">
+          <Surface as="article" variant="subtle" className="stack-xs">
             <p className="micro-label">Win condition</p>
-            <p className="mission-summary" style={{ marginTop: "8px" }}>
-              {mission.winCondition}
-            </p>
+            <p className="mission-summary">{mission.winCondition}</p>
           </Surface>
         </DetailPairGrid>
 
-        <div className="list-stack" style={{ marginTop: "22px" }}>
+        <div className="list-stack">
           {mission.lessonBlocks.map((block) => (
-            <Surface key={block.title} as="article" variant="detail">
+            <Surface key={block.title} as="article" variant="subtle" className="stack-sm">
               <p className="micro-label">{block.title}</p>
-              <p className="mission-summary" style={{ marginTop: "8px" }}>
-                {block.body}
-              </p>
-              <ul className="list-copy" style={{ marginTop: "10px" }}>
+              <p className="mission-summary">{block.body}</p>
+              <ul className="list-copy">
                 {block.bullets.map((bullet) => (
                   <li key={bullet}>{bullet}</li>
                 ))}
@@ -61,13 +57,13 @@ export function MissionDetailView({
         </div>
 
         {mission.examplePrompts.length > 0 ? (
-          <Surface variant="detail" style={{ marginTop: "18px" }}>
+          <Surface variant="subtle" className="stack-md">
             <p className="micro-label">Command deck</p>
-            <div className="list-stack" style={{ marginTop: "14px" }}>
+            <div className="list-stack">
               {mission.examplePrompts.map((example) => (
-                <Surface key={example.label} as="article" variant="prompt">
+                <Surface key={example.label} as="article" variant="code" className="stack-xs">
                   <p className="micro-label">{example.label}</p>
-                  <pre className="example-prompt" style={{ marginTop: "10px" }}>
+                  <pre className="example-prompt">
                     <code>{example.prompt}</code>
                   </pre>
                 </Surface>
@@ -76,9 +72,9 @@ export function MissionDetailView({
           </Surface>
         ) : null}
 
-        <Surface variant="detail" style={{ marginTop: "18px" }}>
+        <Surface variant="subtle" className="stack-sm">
           <p className="micro-label">Evidence anchors</p>
-          <ul className="list-copy" style={{ marginTop: "10px" }}>
+          <ul className="list-copy">
             {mission.evidenceBullets.map((bullet) => (
               <li key={bullet}>{bullet}</li>
             ))}
@@ -87,17 +83,15 @@ export function MissionDetailView({
       </Surface>
 
       <StickyAside>
-        <Surface as="section" variant="tool">
+        <Surface as="section" variant="elevated" className="stack-md">
           <p className="micro-label">Unlocked quick ref</p>
-          <h2 className="mission-title" style={{ marginTop: "6px" }}>
-            {quickRef?.title}
-          </h2>
-          <p className="muted-copy" style={{ marginTop: "8px" }}>
-            {quickRef?.summary}
-          </p>
-          <div className="detail-actions" style={{ marginTop: "16px" }}>
+          <div className="stack-xs">
+            <h2 className="mission-title">{quickRef?.title}</h2>
+            <p className="muted-copy">{quickRef?.summary}</p>
+          </div>
+          <div className="detail-actions">
             {mission.practiceMode === "prompt-lab" || mission.practiceMode === "mixed" ? (
-              <LinkButton href="/prompt-lab" variant="primary">
+              <LinkButton href="/prompt-lab" variant="primary" size="sm">
                 Open Prompt Lab
               </LinkButton>
             ) : null}
@@ -105,6 +99,7 @@ export function MissionDetailView({
               <LinkButton
                 href={`/simulator?scenario=${missionScenarios[0]?.id ?? mission.slug}`}
                 variant="secondary"
+                size="sm"
               >
                 Run simulator
               </LinkButton>
@@ -112,33 +107,33 @@ export function MissionDetailView({
           </div>
         </Surface>
 
-        <Surface as="section" variant="tool">
+        <Surface as="section" variant="elevated" className="stack-sm">
           <p className="micro-label">Common traps</p>
-          <ul className="list-copy" style={{ marginTop: "12px" }}>
+          <ul className="list-copy">
             {mission.failureModes.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </Surface>
 
-        <Surface as="section" variant="tool">
+        <Surface as="section" variant="elevated" className="stack-sm">
           <p className="micro-label">Scenario deck</p>
           {missionScenarios.length > 0 ? (
-            <div className="list-stack" style={{ marginTop: "14px" }}>
+            <div className="list-stack">
               {missionScenarios.map((scenario) => (
-                <LinkButton key={scenario.id} href={`/simulator?scenario=${scenario.id}`} variant="secondary">
+                <LinkButton key={scenario.id} href={`/simulator?scenario=${scenario.id}`} variant="secondary" size="sm">
                   {scenario.title}
                 </LinkButton>
               ))}
             </div>
           ) : (
-            <div className="empty-state" style={{ marginTop: "14px" }}>
+            <div className="empty-state">
               Stage nay nghiêng về command deck va Prompt Lab hon la simulator.
             </div>
           )}
         </Surface>
 
-        <Surface as="section" variant="tool">
+        <Surface as="section" variant="elevated" className="stack-sm">
           <p className="micro-label">Next stages</p>
           <MissionMap missions={relatedMissions} compact />
         </Surface>

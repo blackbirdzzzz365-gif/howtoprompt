@@ -13,24 +13,27 @@ export function PathChooser({ paths }: { paths: LearningPath[] }) {
         <button
           key={path.slug}
           type="button"
-          className="path-card"
+          className="path-card stack-lg"
           data-active={hydrated && activePathSlug === path.slug}
           onClick={() => {
             selectPath(path.slug);
             void recordEvent("path_focus", { pathSlug: path.slug });
           }}
         >
-          <p className="eyebrow">Recommended</p>
-          <h3 className="mission-title">{path.title}</h3>
-          <p className="mission-summary" style={{ marginTop: "8px" }}>
-            {path.summary}
-          </p>
-          <p className="muted-copy" style={{ marginTop: "12px" }}>
-            Hop voi: {path.recommendedFor}
-          </p>
-          <div className="chip-row" style={{ marginTop: "16px" }}>
-            <Chip>{path.primaryMissionSlugs.length} missions</Chip>
-            {hydrated && activePathSlug === path.slug ? <Chip variant="status">Dang theo</Chip> : null}
+          <div className="stack-sm">
+            <p className="eyebrow">Recommended path</p>
+            <div className="stack-xs">
+              <h3 className="mission-title">{path.title}</h3>
+              <p className="mission-summary">{path.summary}</p>
+            </div>
+          </div>
+
+          <p className="muted-copy">Hợp với: {path.recommendedFor}</p>
+
+          <div className="chip-row">
+            <Chip variant="neutral">{path.primaryMissionSlugs.length} missions</Chip>
+            <Chip variant="outline">focus route</Chip>
+            {hydrated && activePathSlug === path.slug ? <Chip variant="success">Dang theo</Chip> : null}
           </div>
         </button>
       ))}
