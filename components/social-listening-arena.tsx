@@ -1,8 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useAcademyProgress } from "@/components/app-provider";
+import { Button, LinkButton } from "@/components/ui/button";
+import { Chip } from "@/components/ui/chip";
+import { PageSection } from "@/components/ui/layout";
+import { Surface } from "@/components/ui/surface";
 
 type RoleId = "owner" | "linux_main" | "lavis_linux" | "gaubot" | "codex" | "github";
 
@@ -403,7 +406,7 @@ export function SocialListeningArena() {
 
   return (
     <>
-      <section className="panel section-block panel-strong arena-hero">
+      <Surface as="section" variant="panelStrong" className="section-block arena-hero">
         <p className="eyebrow">Dedicated demo page</p>
         <h1 className="display-title">Social Listening Arena</h1>
         <p className="hero-subtitle">
@@ -411,51 +414,51 @@ export function SocialListeningArena() {
           `social-listening-v3` dung gate, dung bot, dung skill, va dung artifact.
         </p>
         <div className="hero-actions">
-          <Link href="/prompt-lab" className="button-primary">
+          <LinkButton href="/prompt-lab" variant="primary">
             Practice prompts first
-          </Link>
-          <Link href="/ops" className="button-secondary">
+          </LinkButton>
+          <LinkButton href="/ops" variant="secondary">
             Open runtime deck
-          </Link>
-          <Link href="/missions" className="button-ghost">
+          </LinkButton>
+          <LinkButton href="/missions" variant="ghost">
             Return to stage map
-          </Link>
+          </LinkButton>
         </div>
-      </section>
+      </Surface>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">How to read this board</p>
         <div className="arena-intro-grid">
-          <article className="detail-card">
+          <Surface as="article" variant="detail">
             <p className="micro-label">You say</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Cau prompt that ban nen noi voi bot. Neu gate sai, ca quest se lech.
             </p>
-          </article>
-          <article className="detail-card">
+          </Surface>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Bot to Codex</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Bot la dispatcher giu ticket, boundary, va stop rule. No khong thay Codex lam viec ky thuat.
             </p>
-          </article>
-          <article className="detail-card">
+          </Surface>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Codex does</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Codex doc skills, doc repo, chay lenh, sua file, tao artifact, va tra lai bang chung cho bot.
             </p>
-          </article>
-          <article className="detail-card">
+          </Surface>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Loot / gate</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Moi quest co mot loot ro rang: checkpoint verdict hoac candidate summary. Khong co loot do thi chua duoc qua gate.
             </p>
-          </article>
+          </Surface>
         </div>
-      </section>
+      </PageSection>
 
       <div className="arena-layout">
         <aside className="quest-rail">
-          <section className="tool-card">
+          <Surface as="section" variant="tool">
             <p className="micro-label">Quest board</p>
             <div className="list-stack" style={{ marginTop: "14px" }}>
               {quests.map((item) => (
@@ -469,8 +472,8 @@ export function SocialListeningArena() {
                   }}
                 >
                   <div className="chip-row">
-                    <span className="chip">{item.difficulty}</span>
-                    <span className="outline-chip">{item.turns.length} turns</span>
+                    <Chip>{item.difficulty}</Chip>
+                    <Chip variant="outline">{item.turns.length} turns</Chip>
                   </div>
                   <h2 className="mission-title" style={{ marginTop: "12px" }}>
                     {item.title}
@@ -481,32 +484,28 @@ export function SocialListeningArena() {
                 </button>
               ))}
             </div>
-          </section>
+          </Surface>
 
-          <section className="tool-card">
+          <Surface as="section" variant="tool">
             <p className="micro-label">Party for this quest</p>
             <div className="tag-row" style={{ marginTop: "12px" }}>
               {quest.party.map((roleId) => {
                 const role = roles.find((item) => item.id === roleId);
-                return (
-                  <span key={roleId} className="chip">
-                    {role?.name ?? roleId}
-                  </span>
-                );
+                return <Chip key={roleId}>{role?.name ?? roleId}</Chip>;
               })}
             </div>
             <p className="muted-copy" style={{ marginTop: "12px" }}>
               {quest.whenToPlay}
             </p>
-          </section>
+          </Surface>
         </aside>
 
-        <section className="panel section-block panel-strong">
+        <Surface as="section" variant="panelStrong" className="section-block">
           <div className="chip-row">
-            <span className="chip">{quest.difficulty}</span>
-            <span className="outline-chip">
+            <Chip>{quest.difficulty}</Chip>
+            <Chip variant="outline">
               Turn {turnIndex + 1}/{quest.turns.length}
-            </span>
+            </Chip>
           </div>
           <h2 className="section-title" style={{ marginTop: "16px" }}>
             {quest.title}
@@ -514,72 +513,70 @@ export function SocialListeningArena() {
           <p className="section-copy">{quest.objective}</p>
 
           <div className="arena-meta-grid" style={{ marginTop: "20px" }}>
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">When to play</p>
               <p className="mission-summary" style={{ marginTop: "8px" }}>
                 {quest.whenToPlay}
               </p>
-            </article>
-            <article className="detail-card">
+            </Surface>
+            <Surface as="article" variant="detail">
               <p className="micro-label">Win condition</p>
               <p className="mission-summary" style={{ marginTop: "8px" }}>
                 {quest.winCondition}
               </p>
-            </article>
-            <article className="detail-card">
+            </Surface>
+            <Surface as="article" variant="detail">
               <p className="micro-label">Common bad move</p>
               <p className="mission-summary" style={{ marginTop: "8px" }}>
                 {quest.badMove}
               </p>
-            </article>
+            </Surface>
           </div>
 
           <div className="detail-actions" style={{ marginTop: "20px" }}>
-            <button
-              type="button"
-              className="button-ghost"
+            <Button
+              variant="ghost"
               onClick={() => {
                 void moveTurn(-1);
               }}
-              disabled={turnIndex === 0}
+              disabled={turnIndex == 0}
             >
               Previous turn
-            </button>
-            <button
-              type="button"
-              className="button-primary"
+            </Button>
+            <Button
+              variant="primary"
               onClick={() => {
                 void moveTurn(1);
               }}
               disabled={turnIndex === quest.turns.length - 1}
             >
               Next turn
-            </button>
+            </Button>
           </div>
 
           <div className="arena-turn-grid" style={{ marginTop: "22px" }}>
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">{turn.title}</p>
               <pre className="example-prompt" style={{ marginTop: "12px" }}>
                 <code>{turn.ownerLine}</code>
               </pre>
-            </article>
+            </Surface>
 
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Bot interacts with Codex</p>
               <p className="mission-summary" style={{ marginTop: "10px" }}>
                 {turn.botMove}
               </p>
-            </article>
+            </Surface>
 
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Codex does</p>
               <p className="mission-summary" style={{ marginTop: "10px" }}>
                 {turn.codexMove}
               </p>
-            </article>
+            </Surface>
 
-            <article className="detail-card">
+            <Surface as="article" variant="detail">
               <p className="micro-label">Loot and stop rule</p>
               <ul className="list-copy" style={{ marginTop: "10px" }}>
                 {turn.artifacts.map((artifact) => (
@@ -589,11 +586,11 @@ export function SocialListeningArena() {
               <p className="muted-copy" style={{ marginTop: "12px" }}>
                 {turn.stopRule}
               </p>
-            </article>
+            </Surface>
           </div>
 
           <div className="arena-support-grid" style={{ marginTop: "20px" }}>
-            <article className="tool-card">
+            <Surface as="article" variant="tool">
               <p className="micro-label">Skill loadout</p>
               <div className="tag-row" style={{ marginTop: "12px" }}>
                 {turn.skills.map((skill) => (
@@ -602,27 +599,27 @@ export function SocialListeningArena() {
                   </span>
                 ))}
               </div>
-            </article>
+            </Surface>
 
-            <article className="tool-card">
+            <Surface as="article" variant="tool">
               <p className="micro-label">Why this turn matters</p>
               <p className="muted-copy" style={{ marginTop: "10px" }}>
                 {turn.takeaway}
               </p>
-            </article>
+            </Surface>
           </div>
-        </section>
+        </Surface>
       </div>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Party roles</p>
         <h2 className="section-title">Ai lam gi trong game nay</h2>
         <div className="role-grid">
           {roles.map((role) => (
-            <article key={role.id} className="role-card" data-active={activeRoleIds.includes(role.id)}>
+            <Surface key={role.id} as="article" variant="role" data-active={activeRoleIds.includes(role.id)}>
               <div className="chip-row">
-                <span className="chip">{role.classLabel}</span>
-                {activeRoleIds.includes(role.id) ? <span className="status-chip">Active in quest</span> : null}
+                <Chip>{role.classLabel}</Chip>
+                {activeRoleIds.includes(role.id) ? <Chip variant="status">Active in quest</Chip> : null}
               </div>
               <h3 className="mission-title" style={{ marginTop: "12px" }}>
                 {role.name}
@@ -640,12 +637,12 @@ export function SocialListeningArena() {
                   </span>
                 ))}
               </div>
-            </article>
+            </Surface>
           ))}
         </div>
-      </section>
+      </PageSection>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Skill Atlas</p>
         <h2 className="section-title">Muốn tra cứu skill của host, Codex linuxvm và OpenClaw linuxvm ở một chỗ</h2>
         <p className="section-copy">
@@ -653,47 +650,47 @@ export function SocialListeningArena() {
           trên `linuxvm`, và bundle OpenClaw trên `linuxvm`, rồi hỏi AI nên dùng skill nào cho đúng tình huống.
         </p>
         <div className="hero-actions">
-          <Link href="/social-listening-arena/skills" className="button-primary">
+          <LinkButton href="/social-listening-arena/skills" variant="primary">
             Codex host
-          </Link>
-          <Link href="/social-listening-arena/skills-vm-codex" className="button-secondary">
+          </LinkButton>
+          <LinkButton href="/social-listening-arena/skills-vm-codex" variant="secondary">
             Codex linuxvm
-          </Link>
-          <Link href="/social-listening-arena/skills-vm-openclaw" className="button-secondary">
+          </LinkButton>
+          <LinkButton href="/social-listening-arena/skills-vm-openclaw" variant="secondary">
             OpenClaw linuxvm
-          </Link>
+          </LinkButton>
         </div>
-      </section>
+      </PageSection>
 
-      <section className="panel section-block">
+      <PageSection>
         <p className="eyebrow">Feynman shortcuts</p>
         <div className="arena-intro-grid">
-          <article className="detail-card">
+          <Surface as="article" variant="detail">
             <p className="micro-label">Bot is not the coder</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Bot giong nhu nguoi doi truong giu boi canh, ticket, stop rule, va ket noi ban voi Codex.
             </p>
-          </article>
-          <article className="detail-card">
+          </Surface>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Codex is the worker</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Codex moi la thang doc file, chay script, tao branch, sua code, va viet artifact.
             </p>
-          </article>
-          <article className="detail-card">
+          </Surface>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Owner controls the gates</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Neu ban khong noi `Chot huong:` hoac `khong merge neu toi chua chot`, he thong se phai doan y ban.
             </p>
-          </article>
-          <article className="detail-card">
+          </Surface>
+          <Surface as="article" variant="detail">
             <p className="micro-label">Production closes the loop</p>
             <p className="mission-summary" style={{ marginTop: "8px" }}>
               Deploy chi la o giua game. Revalidation tren production that moi cho biet quest co thang hay khong.
             </p>
-          </article>
+          </Surface>
         </div>
-      </section>
+      </PageSection>
     </>
   );
 }

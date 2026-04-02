@@ -9,6 +9,7 @@ const surfaceVariants = {
   panelStrong: "panel panel-strong",
   prompt: "prompt-card",
   quickRef: "quick-ref-card",
+  role: "role-card",
   reference: "reference-card",
   signal: "signal-card",
   skill: "skill-card",
